@@ -1,0 +1,8 @@
+{
+	"name": "parlons",
+	"compatibility_date": "2026-10-02",
+	"assets": {
+		"directory": "./dist"
+	},
+	"previews": {}
+}
