@@ -15,5 +15,24 @@
 		<h1>Parlons</h1>
 		<p>Deployment test — feature branch</p>
 		<p>Test text</p>
+		<ul id="prompts"></ul>
+		<script>
+			import { createClient } from '@supabase/supabase-js';
+			import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from 'astro:env/client';
+
+			const list = document.getElementById('prompts')!;
+			const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+			const { data, error } = await supabase.from('prompts').select('language, theme, text');
+
+			if (error) {
+				list.textContent = `Error: ${error.message}`;
+			} else {
+				for (const row of data) {
+					const li = document.createElement('li');
+					li.textContent = `${row.language} | ${row.theme} | ${row.text}`;
+					list.append(li);
+				}
+			}
+		</script>
 	</body>
 </html>
