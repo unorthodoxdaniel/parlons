@@ -22,14 +22,14 @@
 
 			const list = document.getElementById('prompts')!;
 			const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY);
-			const { data, error } = await supabase.from('prompts').select('language, theme, text');
+			const { data, error } = await supabase.from('prompts').select('text, languages(code), themes(key)');
 
 			if (error) {
 				list.textContent = `Error: ${error.message}`;
 			} else {
 				for (const row of data) {
 					const li = document.createElement('li');
-					li.textContent = `${row.language} | ${row.theme} | ${row.text}`;
+					li.textContent = `${row.languages?.code} | ${row.themes?.key} | ${row.text}`;
 					list.append(li);
 				}
 			}
