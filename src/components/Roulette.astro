@@ -1,5 +1,6 @@
 ---
 import T from './T.astro';
+import { ui } from '../i18n/ui';
 import {
   DEFAULTS,
   PRACTICE_LANGUAGES,
@@ -8,12 +9,6 @@ import {
   SPEAKING_SECONDS,
   formatDuration,
 } from '../lib/roulette';
-
-const preparation = PREPARATION_SECONDS.map((seconds) => ({
-  value: String(seconds),
-  label: seconds === 0 ? null : formatDuration(seconds),
-}));
-const speaking = SPEAKING_SECONDS.map((seconds) => ({ value: String(seconds), label: formatDuration(seconds) }));
 ---
 
 <div class="panel">
@@ -41,61 +36,52 @@ const speaking = SPEAKING_SECONDS.map((seconds) => ({ value: String(seconds), la
       <h2 id="settings-heading"><T k="settingsHeading" /></h2>
     </div>
 
-    <div class="setting">
-      <span id="practice-language-label" class="eyebrow"><T k="practiceLanguage" /></span>
-      <div class="choices" role="radiogroup" aria-labelledby="practice-language-label" data-setting="practiceLang">
-        {PRACTICE_LANGUAGES.map((option) => (
-          <label class="choice">
-            <input type="radio" class="sr-only" name="practiceLang" value={option.value} checked={option.value === DEFAULTS.practiceLang} autocomplete="off" />
-            <span class="choice-label" lang={option.value}>{option.label}</span>
-          </label>
-        ))}
+    <div class="fields">
+      <div class="field">
+        <label for="practice-language" class="eyebrow"><T k="practiceLanguage" /></label>
+        <div class="select">
+          <select id="practice-language" data-setting="practiceLang" autocomplete="off">
+            {PRACTICE_LANGUAGES.map((option) => (
+              <option value={option.value} lang={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="setting">
-      <span id="theme-label" class="eyebrow"><T k="theme" /></span>
-      <div id="theme-choices" class="choices" role="radiogroup" aria-labelledby="theme-label" data-setting="theme">
-        <label class="choice">
-          <input type="radio" class="sr-only" name="theme" value={RANDOM_THEME} checked autocomplete="off" />
-          <span class="choice-label"><T k="themeRandom" /></span>
-        </label>
+      <div class="field">
+        <label for="theme" class="eyebrow"><T k="theme" /></label>
+        <div class="select">
+          <select id="theme" data-setting="theme" autocomplete="off">
+            <option value={RANDOM_THEME} data-en={ui.en.themeRandom} data-fr={ui.fr.themeRandom} selected>{ui.en.themeRandom}</option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="setting">
-      <span id="preparation-label" class="eyebrow"><T k="preparationTime" /></span>
-      <div class="choices" role="radiogroup" aria-labelledby="preparation-label" data-setting="preparationSeconds">
-        {preparation.map((option) => (
-          <label class="choice">
-            <input type="radio" class="sr-only" name="preparationSeconds" value={option.value} checked={Number(option.value) === DEFAULTS.preparationSeconds} autocomplete="off" />
-            <span class="choice-label">{option.label ?? <T k="spontaneous" />}</span>
-          </label>
-        ))}
+      <div class="field">
+        <label for="preparation" class="eyebrow"><T k="preparationTime" /></label>
+        <div class="select">
+          <select id="preparation" data-setting="preparationSeconds" autocomplete="off">
+            {PREPARATION_SECONDS.map((seconds) => (
+              <option value={seconds} selected={seconds === DEFAULTS.preparationSeconds} data-en={seconds === 0 ? ui.en.spontaneous : undefined} data-fr={seconds === 0 ? ui.fr.spontaneous : undefined}>
+                {seconds === 0 ? ui.en.spontaneous : formatDuration(seconds)}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="setting">
-      <span id="speaking-label" class="eyebrow"><T k="speakingTime" /></span>
-      <div class="choices" role="radiogroup" aria-labelledby="speaking-label" data-setting="speakingSeconds">
-        {speaking.map((option) => (
-          <label class="choice">
-            <input type="radio" class="sr-only" name="speakingSeconds" value={option.value} checked={Number(option.value) === DEFAULTS.speakingSeconds} autocomplete="off" />
-            <span class="choice-label">{option.label}</span>
-          </label>
-        ))}
+      <div class="field">
+        <label for="speaking" class="eyebrow"><T k="speakingTime" /></label>
+        <div class="select">
+          <select id="speaking" data-setting="speakingSeconds" autocomplete="off">
+            {SPEAKING_SECONDS.map((seconds) => (
+              <option value={seconds} selected={seconds === DEFAULTS.speakingSeconds}>{formatDuration(seconds)}</option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   </section>
-
-  <!-- Cloned for each theme loaded from Supabase; rendered here so it carries
-       this component's scoped styles. -->
-  <template id="theme-choice-template">
-    <label class="choice">
-      <input type="radio" class="sr-only" name="theme" autocomplete="off" />
-      <span class="choice-label"></span>
-    </label>
-  </template>
 </div>
 
 <script>
@@ -123,15 +109,20 @@ const speaking = SPEAKING_SECONDS.map((seconds) => ({ value: String(seconds), la
   const spinButton = $<HTMLButtonElement>('spin');
   const sessionButton = $<HTMLButtonElement>('session');
   const sessionNote = $('session-note');
-  const themeChoices = $('theme-choices');
-  const themeTemplate = $<HTMLTemplateElement>('theme-choice-template');
+  const themeSelect = $<HTMLSelectElement>('theme');
+
+  function uiLang() {
+    return document.documentElement.dataset.uiLang === 'fr' ? 'fr' : 'en';
+  }
 
   // Everything the roulette and the next change (timers) need lives here.
   const state = {
     load: 'loading' as 'loading' | 'ready' | 'error',
     prompts: [] as Prompt[],
     themes: [] as Theme[],
-    practiceLang: DEFAULTS.practiceLang,
+    // Starts from the interface language; independent once the user chooses.
+    practiceLang: uiLang(),
+    practiceChosen: false,
     theme: DEFAULTS.theme,
     preparationSeconds: DEFAULTS.preparationSeconds,
     speakingSeconds: DEFAULTS.speakingSeconds,
@@ -164,42 +155,72 @@ const speaking = SPEAKING_SECONDS.map((seconds) => ({ value: String(seconds), la
       );
       state.themes = themes.data;
       state.load = 'ready';
-      renderThemeChoices();
+      renderThemeOptions();
     }
     render();
   }
 
   // --- Controls -----------------------------------------------------------
 
-  function renderThemeChoices() {
-    themeChoices.querySelectorAll('[data-db-theme]').forEach((el) => el.remove());
+  // <option> can't hold markup, so translated options carry data-en / data-fr
+  // and are relabelled whenever the interface language changes.
+  function labelOptions() {
+    const lang = uiLang();
+    document.querySelectorAll<HTMLOptionElement>('option[data-en]').forEach((option) => {
+      option.textContent = option.dataset[lang] ?? option.dataset.en!;
+    });
+  }
+
+  function renderThemeOptions() {
+    themeSelect.querySelectorAll('[data-db-theme]').forEach((el) => el.remove());
     for (const theme of state.themes) {
-      const choice = themeTemplate.content.firstElementChild!.cloneNode(true) as HTMLElement;
-      choice.dataset.dbTheme = '';
-      const input = choice.querySelector('input')!;
-      input.value = theme.key;
-      input.checked = theme.key === state.theme;
-      choice.querySelector('.choice-label')!.innerHTML = bilingual(themeName(theme.key, theme.name));
-      themeChoices.append(choice);
+      const names = themeName(theme.key, theme.name);
+      const option = new Option(names.en, theme.key);
+      option.dataset.dbTheme = '';
+      option.dataset.en = names.en;
+      option.dataset.fr = names.fr;
+      themeSelect.append(option);
+    }
+    themeSelect.value = state.theme;
+    labelOptions();
+  }
+
+  // A prompt that no longer fits the practice language or theme must not stay
+  // on screen. Timer settings never invalidate it.
+  function dropMismatchedPrompt() {
+    if (state.prompt && !matches(state.prompt, state.practiceLang, state.theme)) {
+      state.prompt = null;
+      state.cleared = true;
     }
   }
 
-  document.querySelectorAll<HTMLElement>('[data-setting]').forEach((group) => {
-    group.addEventListener('change', (event) => {
-      const input = event.target as HTMLInputElement;
-      const setting = group.dataset.setting as 'practiceLang' | 'theme' | 'preparationSeconds' | 'speakingSeconds';
-      if (setting === 'practiceLang' || setting === 'theme') state[setting] = input.value;
-      else state[setting] = Number(input.value);
+  const practiceSelect = $<HTMLSelectElement>('practice-language');
+  practiceSelect.value = state.practiceLang;
 
-      // A prompt that no longer fits the practice language or theme must not
-      // stay on screen. Timer settings never invalidate it.
-      if (state.prompt && !matches(state.prompt, state.practiceLang, state.theme)) {
-        state.prompt = null;
-        state.cleared = true;
-      }
+  document.querySelectorAll<HTMLSelectElement>('select[data-setting]').forEach((select) => {
+    select.addEventListener('change', () => {
+      const setting = select.dataset.setting as 'practiceLang' | 'theme' | 'preparationSeconds' | 'speakingSeconds';
+      if (setting === 'practiceLang') {
+        state.practiceLang = select.value;
+        state.practiceChosen = true;
+      } else if (setting === 'theme') state.theme = select.value;
+      else state[setting] = Number(select.value);
+      dropMismatchedPrompt();
       render();
     });
   });
+
+  // Interface language changed: relabel options and, until the user has chosen
+  // a practice language themselves, keep the practice language in step.
+  new MutationObserver(() => {
+    labelOptions();
+    if (!state.practiceChosen && state.practiceLang !== uiLang()) {
+      state.practiceLang = practiceSelect.value = uiLang();
+      dropMismatchedPrompt();
+      render();
+    }
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-ui-lang'] });
+  labelOptions();
 
   // --- Roulette -----------------------------------------------------------
 
@@ -369,41 +390,43 @@ const speaking = SPEAKING_SECONDS.map((seconds) => ({ value: String(seconds), la
     font-size: .8rem;
   }
 
-  /* Settings: one underlined-text row per setting, no boxes. */
+  /* Settings: compact labelled dropdowns in a grid; native <select>, restyled
+     as an underlined row rather than a box. */
 
-  .setting { padding: 16px 0 6px; border-bottom: 1px solid var(--rule); }
-  .setting:last-child { border-bottom: 0; }
-
-  .choices {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 4px;
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 28px;
+    padding-top: 22px;
   }
 
-  .choice {
-    display: inline-flex;
-    align-items: center;
-    min-width: 44px;
-    min-height: 44px;
-    padding-right: 12px;
+  .field { display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; }
+
+  .select { position: relative; }
+
+  /* The caret is an arrow glyph, drawn on the wrapper so the select stays native. */
+  .select::after {
+    content: '↓';
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--muted);
+    pointer-events: none;
+  }
+
+  select {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 28px 0 0;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
     cursor: pointer;
-  }
-
-  .choice:hover { color: var(--ink); }
-
-  /* Selected: ink and a heavier underline, so it never relies on colour alone. */
-  .choice:has(input:checked) { color: var(--ink); }
-  .choice input:checked + .choice-label {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: .35em;
-  }
-
-  /* The input is visually hidden, so the focus ring goes on the label text. */
-  .choice input:focus-visible + .choice-label {
-    outline: 2px solid var(--ink);
-    outline-offset: 3px;
+    appearance: none;
   }
 
   @media (max-width: 860px) {

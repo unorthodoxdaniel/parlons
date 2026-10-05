@@ -68,7 +68,7 @@ Do not introduce generic app or SaaS patterns: card-heavy layouts, rounded recta
 These are two separate things. Never couple them.
 
 - **Interface language** (`en` or `fr`) is the language of Parlons's own UI text. On first visit it follows the browser's preferred language (`fr` and `fr-*` give French, anything else English). The header's FR / EN switch overrides that and the choice is saved in `localStorage` under `parlons:ui-lang`. `<html lang>` and `html[data-ui-lang]` reflect it.
-- **Practice language** is the language of the prompt being practised. It comes from the database, is never changed by the interface switch, and is marked up with its own `lang` attribute on the prompt text.
+- **Practice language** is the language of the prompt being practised. It comes from the database and is marked up with its own `lang` attribute on the prompt text. Its *initial value* matches the interface language, and it follows the FR / EN switch until the user picks a practice language themselves; from then on the interface switch never changes it.
 
 UI strings live in `src/i18n/ui.ts`, with the same keys in `en` and `fr`. Render them with `<T k="key" />`, which outputs both languages and lets CSS show the active one, so there is no flash and no client-side string swapping. Do not hard-code UI text in components. This is intentionally minimal; do not grow it into a larger localization system without asking.
 
