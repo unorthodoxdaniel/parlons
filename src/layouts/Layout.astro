@@ -1,0 +1,45 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Parlons',
+  description = 'Speaking prompts for language practice. Sujets pour pratiquer l’oral.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <title>{title}</title>
+
+    <!-- Interface language: a saved explicit choice wins; otherwise fr / fr-* in
+         the browser's preferred language means French, anything else English.
+         Runs before first paint so the page never flashes the wrong language. -->
+    <script is:inline>
+      (function () {
+        var lang;
+        try { lang = localStorage.getItem('parlons:ui-lang'); } catch (e) {}
+        if (lang !== 'fr' && lang !== 'en') {
+          var preferred = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+          lang = /^fr(-|$)/i.test(preferred) ? 'fr' : 'en';
+        }
+        document.documentElement.dataset.uiLang = lang;
+        document.documentElement.lang = lang;
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,118 @@
+/* Parlons shares its visual system with Niel Parle: same palette, type roles,
+   shell, rules and states. Tokens and primitives below are carried over from
+   nielparle-site/src/styles/global.css. */
+
+:root {
+  --paper: #f7f5f0;
+  --ink: #181818;
+  --muted: #6f6c66;
+  --accent: #d8492f;
+  --error: #bd3c26;
+  --rule: #cfcbc2;
+  --site-width: 1180px;
+  --reading-width: 720px;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: Arial, Helvetica, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+main { flex: 1; }
+
+/* --accent is ~3.9:1 on --paper: fine for large text and non-text marks, not
+   for small text. Small-text states (hover, selected) use ink, underline or
+   weight instead. */
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: .2em; }
+
+img, video, iframe { max-width: 100%; }
+
+button, input { font: inherit; }
+
+button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled { color: var(--muted); cursor: default; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+::selection { background: var(--ink); color: var(--paper); }
+
+.site-shell {
+  width: min(calc(100% - 48px), var(--site-width));
+  margin-inline: auto;
+}
+
+.eyebrow,
+.meta {
+  color: var(--muted);
+  font-size: .72rem;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.rule-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--ink);
+}
+
+.rule-heading h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Interface language. UI strings are rendered in both languages (see
+   components/T.astro); the inline script in Layout.astro sets
+   html[data-ui-lang] before first paint and these rules show one. Without
+   JavaScript the English text is shown. */
+.ui[lang="fr"] { display: none; }
+[data-ui-lang="fr"] .ui[lang="fr"] { display: inline; }
+[data-ui-lang="fr"] .ui[lang="en"] { display: none; }
+
+@media (max-width: 760px) {
+  .site-shell { width: min(calc(100% - 32px), var(--site-width)); }
+}

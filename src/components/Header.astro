@@ -1,0 +1,83 @@
+---
+import T from './T.astro';
+---
+
+<header class="site-header site-shell">
+  <a class="brand" href="/">Parlons</a>
+
+  <div class="lang-switch meta" role="group" aria-labelledby="lang-switch-label">
+    <span id="lang-switch-label" class="sr-only"><T k="interfaceLanguage" /></span>
+    <button type="button" lang="fr" aria-label="Français" data-ui-lang-choice="fr" aria-pressed="false">FR</button>
+    <span aria-hidden="true">/</span>
+    <button type="button" lang="en" aria-label="English" data-ui-lang-choice="en" aria-pressed="true">EN</button>
+  </div>
+</header>
+
+<script>
+  // Persist an explicit interface-language choice. This only affects interface
+  // strings; it never touches the language being practised.
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-ui-lang-choice]');
+  const root = document.documentElement;
+
+  const sync = () => {
+    for (const button of buttons) {
+      button.setAttribute('aria-pressed', String(button.dataset.uiLangChoice === root.dataset.uiLang));
+    }
+  };
+
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const lang = button.dataset.uiLangChoice!;
+      root.dataset.uiLang = lang;
+      root.lang = lang;
+      try { localStorage.setItem('parlons:ui-lang', lang); } catch {}
+      sync();
+    });
+  }
+
+  sync();
+</script>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 8px;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .brand {
+    font-family: var(--serif);
+    font-size: 1.45rem;
+    font-style: italic;
+    letter-spacing: -.03em;
+  }
+
+  .lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  /* Subtle, but a 44px hit area. */
+  .lang-switch button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+
+  .lang-switch button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: .3em; }
+
+  /* Selected state: ink, bold and underlined (not accent, not colour alone). */
+  .lang-switch button[aria-pressed='true'] {
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: .3em;
+  }
+</style>
