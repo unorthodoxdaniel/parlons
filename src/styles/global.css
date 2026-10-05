@@ -36,6 +36,9 @@ body {
 
 main { flex: 1; }
 
+/* Component display rules must not override the hidden attribute. */
+[hidden] { display: none !important; }
+
 /* --accent is ~3.9:1 on --paper: fine for large text and non-text marks, not
    for small text. Small-text states (hover, selected) use ink, underline or
    weight instead. */
@@ -54,7 +57,8 @@ button {
   cursor: pointer;
 }
 
-button:disabled { color: var(--muted); cursor: default; }
+button:disabled,
+button[aria-disabled='true'] { color: var(--muted); cursor: default; }
 
 :focus-visible {
   outline: 2px solid var(--ink);
@@ -104,6 +108,27 @@ button:disabled { color: var(--muted); cursor: default; }
   white-space: nowrap;
   border: 0;
 }
+
+/* Parlons additions (not in nielparle-site): a text action, i.e. a control that
+   is a serif phrase ending in an arrow, with a 44px hit area. `aria-disabled`
+   rather than `disabled` keeps the button focusable and keeps focus where it
+   is while a state changes. */
+.text-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  text-align: left;
+  text-underline-offset: .25em;
+}
+
+.text-action:hover:not([aria-disabled='true']) { text-decoration: underline; }
+
+.text-action.primary { font-size: clamp(1.5rem, 3vw, 1.9rem); letter-spacing: -.02em; }
+
+.text-action:not(.primary) { color: var(--muted); }
+.text-action:not(.primary):hover:not([aria-disabled='true']) { color: var(--ink); }
 
 /* Interface language. UI strings are rendered in both languages (see
    components/T.astro); the inline script in Layout.astro sets
