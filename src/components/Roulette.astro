@@ -1,0 +1,413 @@
+---
+import T from './T.astro';
+import {
+  DEFAULTS,
+  PRACTICE_LANGUAGES,
+  PREPARATION_SECONDS,
+  RANDOM_THEME,
+  SPEAKING_SECONDS,
+  formatDuration,
+} from '../lib/roulette';
+
+const preparation = PREPARATION_SECONDS.map((seconds) => ({
+  value: String(seconds),
+  label: seconds === 0 ? null : formatDuration(seconds),
+}));
+const speaking = SPEAKING_SECONDS.map((seconds) => ({ value: String(seconds), label: formatDuration(seconds) }));
+---
+
+<div class="panel">
+  <section class="stage" aria-labelledby="stage-heading">
+    <div class="rule-heading">
+      <h2 id="stage-heading"><T k="stageHeading" /></h2>
+    </div>
+
+    <div id="stage-body" class="stage-body" role="status" aria-live="polite" aria-atomic="true">
+      <p id="prompt-meta" class="meta" hidden></p>
+      <p id="prompt-text" class="prompt-text" hidden></p>
+      <p id="stage-note" class="stage-note"><T k="loading" /></p>
+    </div>
+
+    <div class="actions">
+      <button type="button" id="retry" class="text-action primary" hidden><T k="retry" /></button>
+      <button type="button" id="spin" class="text-action primary" aria-disabled="true"><T k="spin" /></button>
+      <button type="button" id="session" class="text-action primary" aria-disabled="true" aria-describedby="session-note" hidden></button>
+    </div>
+    <p id="session-note" class="session-note" hidden><T k="sessionSoon" /></p>
+  </section>
+
+  <section class="settings" aria-labelledby="settings-heading">
+    <div class="rule-heading">
+      <h2 id="settings-heading"><T k="settingsHeading" /></h2>
+    </div>
+
+    <div class="setting">
+      <span id="practice-language-label" class="eyebrow"><T k="practiceLanguage" /></span>
+      <div class="choices" role="radiogroup" aria-labelledby="practice-language-label" data-setting="practiceLang">
+        {PRACTICE_LANGUAGES.map((option) => (
+          <label class="choice">
+            <input type="radio" class="sr-only" name="practiceLang" value={option.value} checked={option.value === DEFAULTS.practiceLang} autocomplete="off" />
+            <span class="choice-label" lang={option.value}>{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <div class="setting">
+      <span id="theme-label" class="eyebrow"><T k="theme" /></span>
+      <div id="theme-choices" class="choices" role="radiogroup" aria-labelledby="theme-label" data-setting="theme">
+        <label class="choice">
+          <input type="radio" class="sr-only" name="theme" value={RANDOM_THEME} checked autocomplete="off" />
+          <span class="choice-label"><T k="themeRandom" /></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="setting">
+      <span id="preparation-label" class="eyebrow"><T k="preparationTime" /></span>
+      <div class="choices" role="radiogroup" aria-labelledby="preparation-label" data-setting="preparationSeconds">
+        {preparation.map((option) => (
+          <label class="choice">
+            <input type="radio" class="sr-only" name="preparationSeconds" value={option.value} checked={Number(option.value) === DEFAULTS.preparationSeconds} autocomplete="off" />
+            <span class="choice-label">{option.label ?? <T k="spontaneous" />}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <div class="setting">
+      <span id="speaking-label" class="eyebrow"><T k="speakingTime" /></span>
+      <div class="choices" role="radiogroup" aria-labelledby="speaking-label" data-setting="speakingSeconds">
+        {speaking.map((option) => (
+          <label class="choice">
+            <input type="radio" class="sr-only" name="speakingSeconds" value={option.value} checked={Number(option.value) === DEFAULTS.speakingSeconds} autocomplete="off" />
+            <span class="choice-label">{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Cloned for each theme loaded from Supabase; rendered here so it carries
+       this component's scoped styles. -->
+  <template id="theme-choice-template">
+    <label class="choice">
+      <input type="radio" class="sr-only" name="theme" autocomplete="off" />
+      <span class="choice-label"></span>
+    </label>
+  </template>
+</div>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+  import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from 'astro:env/client';
+  import { bilingual, t, themeName, type UiKey } from '../i18n/ui';
+  import {
+    DEFAULTS,
+    RANDOM_THEME,
+    buildSession,
+    eligiblePrompts,
+    matches,
+    pickPrompt,
+    sessionAction,
+    type Prompt,
+    type Theme,
+  } from '../lib/roulette';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const stageBody = $('stage-body');
+  const metaEl = $('prompt-meta');
+  const textEl = $('prompt-text');
+  const noteEl = $('stage-note');
+  const retryButton = $<HTMLButtonElement>('retry');
+  const spinButton = $<HTMLButtonElement>('spin');
+  const sessionButton = $<HTMLButtonElement>('session');
+  const sessionNote = $('session-note');
+  const themeChoices = $('theme-choices');
+  const themeTemplate = $<HTMLTemplateElement>('theme-choice-template');
+
+  // Everything the roulette and the next change (timers) need lives here.
+  const state = {
+    load: 'loading' as 'loading' | 'ready' | 'error',
+    prompts: [] as Prompt[],
+    themes: [] as Theme[],
+    practiceLang: DEFAULTS.practiceLang,
+    theme: DEFAULTS.theme,
+    preparationSeconds: DEFAULTS.preparationSeconds,
+    speakingSeconds: DEFAULTS.speakingSeconds,
+    prompt: null as Prompt | null,
+    cleared: false, // the last prompt was dropped because settings changed
+    spinning: false,
+  };
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // --- Data ---------------------------------------------------------------
+
+  const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+
+  async function load() {
+    state.load = 'loading';
+    render();
+    const [prompts, themes] = await Promise.all([
+      supabase.from('prompts').select('id, text, languages(code), themes(key)'),
+      supabase.from('themes').select('key, name').order('id'),
+    ]);
+    if (prompts.error || themes.error) {
+      console.error(prompts.error ?? themes.error);
+      state.load = 'error';
+    } else {
+      state.prompts = prompts.data.flatMap((row) =>
+        row.languages && row.themes
+          ? [{ id: row.id, text: row.text, lang: row.languages.code, theme: row.themes.key }]
+          : [],
+      );
+      state.themes = themes.data;
+      state.load = 'ready';
+      renderThemeChoices();
+    }
+    render();
+  }
+
+  // --- Controls -----------------------------------------------------------
+
+  function renderThemeChoices() {
+    themeChoices.querySelectorAll('[data-db-theme]').forEach((el) => el.remove());
+    for (const theme of state.themes) {
+      const choice = themeTemplate.content.firstElementChild!.cloneNode(true) as HTMLElement;
+      choice.dataset.dbTheme = '';
+      const input = choice.querySelector('input')!;
+      input.value = theme.key;
+      input.checked = theme.key === state.theme;
+      choice.querySelector('.choice-label')!.innerHTML = bilingual(themeName(theme.key, theme.name));
+      themeChoices.append(choice);
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-setting]').forEach((group) => {
+    group.addEventListener('change', (event) => {
+      const input = event.target as HTMLInputElement;
+      const setting = group.dataset.setting as 'practiceLang' | 'theme' | 'preparationSeconds' | 'speakingSeconds';
+      if (setting === 'practiceLang' || setting === 'theme') state[setting] = input.value;
+      else state[setting] = Number(input.value);
+
+      // A prompt that no longer fits the practice language or theme must not
+      // stay on screen. Timer settings never invalidate it.
+      if (state.prompt && !matches(state.prompt, state.practiceLang, state.theme)) {
+        state.prompt = null;
+        state.cleared = true;
+      }
+      render();
+    });
+  });
+
+  // --- Roulette -----------------------------------------------------------
+
+  const eligible = () => eligiblePrompts(state.prompts, state.practiceLang, state.theme);
+  const canSpin = () => state.load === 'ready' && !state.spinning && eligible().length > 0;
+
+  function showPrompt(prompt: Prompt) {
+    textEl.lang = prompt.lang; // the practice language, never the interface language
+    // French sets a (non-breaking) space before ? ! : ; so they never wrap alone.
+    textEl.textContent = prompt.lang === 'fr' ? prompt.text.replace(/ ([?!:;»])/g, ' $1') : prompt.text;
+  }
+
+  function wait(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function spin() {
+    if (!canSpin()) return;
+    const pool = eligible();
+    const chosen = pickPrompt(pool, state.prompt)!;
+    state.cleared = false;
+    state.spinning = true;
+    state.prompt = null;
+    stageBody.setAttribute('aria-busy', 'true');
+    render();
+
+    // A short shuffle through eligible prompts, slowing to a stop. Skipped
+    // entirely under prefers-reduced-motion.
+    if (!reducedMotion.matches && pool.length > 1) {
+      let last: Prompt | null = null;
+      for (const delay of [70, 70, 80, 95, 115, 145, 190]) {
+        const frame = pickPrompt(pool, last)!;
+        last = frame;
+        showPrompt(frame);
+        textEl.hidden = false;
+        await wait(delay);
+      }
+    }
+
+    // Settings can change mid-shuffle; never reveal a prompt that no longer fits.
+    const stillFits = matches(chosen, state.practiceLang, state.theme);
+    state.spinning = false;
+    state.prompt = stillFits ? chosen : null;
+    state.cleared = !stillFits;
+    stageBody.removeAttribute('aria-busy');
+    render();
+  }
+
+  spinButton.addEventListener('click', spin);
+
+  // The next change turns this into the move to the preparation / speaking
+  // screen, using buildSession(). It does not navigate yet.
+  sessionButton.addEventListener('click', () => {
+    if (sessionButton.getAttribute('aria-disabled') === 'true' || !state.prompt) return;
+    buildSession(state.prompt, state.preparationSeconds, state.speakingSeconds);
+  });
+
+  retryButton.addEventListener('click', load);
+
+  // --- Rendering ----------------------------------------------------------
+
+  let noteKey: UiKey | null = null;
+  function setNote(key: UiKey | null) {
+    noteEl.hidden = key === null;
+    if (key !== noteKey) {
+      noteEl.innerHTML = key ? t(key) : '';
+      noteKey = key;
+    }
+  }
+
+  function setButtonLabel(button: HTMLElement, key: UiKey) {
+    if (button.dataset.label !== key) {
+      button.innerHTML = t(key);
+      button.dataset.label = key;
+    }
+  }
+
+  function render() {
+    const prompt = state.prompt;
+    const options = eligible();
+
+    // Prompt text and its note.
+    metaEl.hidden = textEl.hidden = !prompt && !state.spinning;
+    if (prompt) {
+      showPrompt(prompt);
+      const theme = state.themes.find((x) => x.key === prompt.theme);
+      metaEl.innerHTML = theme ? bilingual(themeName(theme.key, theme.name)) : '';
+    }
+    if (prompt || state.spinning) {
+      setNote(null);
+      metaEl.hidden = !prompt;
+    } else if (state.load === 'loading') setNote('loading');
+    else if (state.load === 'error') setNote('loadError');
+    else if (state.prompts.length === 0) setNote('empty');
+    else if (options.length === 0) setNote('noMatch');
+    else setNote(state.cleared ? 'cleared' : 'placeholder');
+
+    textEl.classList.toggle('is-shuffling', state.spinning);
+    retryButton.hidden = state.load !== 'error';
+
+    // Roulette. Once a prompt exists the session action is primary and spinning
+    // again is the quieter alternative.
+    spinButton.hidden = state.load === 'error';
+    spinButton.setAttribute('aria-disabled', String(!canSpin()));
+    spinButton.classList.toggle('primary', !prompt);
+    setButtonLabel(spinButton, prompt ? 'spinAgain' : 'spin');
+
+    sessionButton.hidden = sessionNote.hidden = !prompt;
+    if (prompt) setButtonLabel(sessionButton, sessionAction(state.preparationSeconds) === 'prepare' ? 'prepare' : 'startSpeaking');
+  }
+
+  load();
+</script>
+
+<style>
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    column-gap: 72px;
+    align-items: start;
+    padding-bottom: 72px;
+  }
+
+  /* Stage */
+
+  .stage-body {
+    min-height: 11rem;
+    padding: 28px 0 8px;
+  }
+
+  .stage-body .meta { margin: 0 0 12px; }
+
+  .prompt-text {
+    max-width: 760px;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(1.7rem, 3.4vw, 2.7rem);
+    line-height: 1.18;
+    letter-spacing: -.02em;
+  }
+
+  .prompt-text.is-shuffling { color: var(--muted); }
+
+  .stage-note {
+    max-width: var(--reading-width);
+    margin: 0;
+    color: var(--muted);
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    line-height: 1.35;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 32px;
+    padding-top: 12px;
+  }
+
+  /* The session action sits first once a prompt exists. */
+  #session { order: -1; }
+
+  .session-note {
+    margin: 0;
+    color: var(--muted);
+    font-size: .8rem;
+  }
+
+  /* Settings: one underlined-text row per setting, no boxes. */
+
+  .setting { padding: 16px 0 6px; border-bottom: 1px solid var(--rule); }
+  .setting:last-child { border-bottom: 0; }
+
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 4px;
+  }
+
+  .choice {
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding-right: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .choice:hover { color: var(--ink); }
+
+  /* Selected: ink and a heavier underline, so it never relies on colour alone. */
+  .choice:has(input:checked) { color: var(--ink); }
+  .choice input:checked + .choice-label {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: .35em;
+  }
+
+  /* The input is visually hidden, so the focus ring goes on the label text. */
+  .choice input:focus-visible + .choice-label {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 860px) {
+    .panel { grid-template-columns: minmax(0, 1fr); }
+    .settings { margin-top: 40px; }
+  }
+</style>

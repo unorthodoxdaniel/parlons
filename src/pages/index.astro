@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Roulette from '../components/Roulette.astro';
 import T from '../components/T.astro';
 ---
 
@@ -14,111 +15,27 @@ import T from '../components/T.astro';
       <h1><T k="headline" /></h1>
     </section>
 
-    <section class="prompts-section" aria-labelledby="prompts-heading">
-      <div class="rule-heading">
-        <h2 id="prompts-heading"><T k="promptsHeading" /></h2>
-      </div>
-
-      <p id="prompts-status" class="status" role="status"><T k="loading" /></p>
-      <p id="prompts-error" class="status error" role="alert" hidden><T k="loadError" /></p>
-      <ul id="prompts" class="prompts"></ul>
-    </section>
+    <Roulette />
   </main>
 
   <Footer />
 </Layout>
 
-<script>
-  import { createClient } from '@supabase/supabase-js';
-  import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from 'astro:env/client';
-
-  const list = document.getElementById('prompts')!;
-  const status = document.getElementById('prompts-status')!;
-  const errorMessage = document.getElementById('prompts-error')!;
-
-  const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY);
-  const { data, error } = await supabase.from('prompts').select('text, languages(code), themes(key)');
-
-  if (error) {
-    console.error(error);
-    status.hidden = true;
-    errorMessage.hidden = false;
-  } else if (data.length === 0) {
-    // Keep the status element; swap its text for the localized empty message.
-    status.innerHTML = document.getElementById('empty-message')!.innerHTML;
-  } else {
-    status.hidden = true;
-    for (const row of data) {
-      const li = document.createElement('li');
-
-      const meta = document.createElement('p');
-      meta.className = 'meta';
-      meta.textContent = `${row.languages?.code} · ${row.themes?.key}`;
-
-      // The prompt is in the practice language, independent of the interface language.
-      const text = document.createElement('p');
-      text.className = 'prompt-text';
-      if (row.languages?.code) text.lang = row.languages.code;
-      text.textContent = row.text;
-
-      li.append(meta, text);
-      list.append(li);
-    }
-  }
-</script>
-
-<template id="empty-message"><T k="empty" /></template>
-
 <style>
-  .intro {
-    padding: 80px 0 58px;
-    border-bottom: 1px solid var(--rule);
-  }
+  .intro { padding: 56px 0 40px; }
 
-  .eyebrow { margin: 0 0 16px; }
+  .eyebrow { margin: 0 0 14px; }
 
   h1 {
     margin: 0;
     font-family: var(--serif);
-    font-size: clamp(3.4rem, 8vw, 6.8rem);
+    font-size: clamp(2.8rem, 6vw, 4.8rem);
     font-weight: 400;
     line-height: .9;
     letter-spacing: -.06em;
   }
 
-  .status {
-    margin: 0;
-    padding: 28px 0;
-    color: var(--muted);
-  }
-
-  .status.error { color: var(--error); }
-
-  .prompts {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  /* Prompt rows are created by the script above, so they don't carry Astro's
-     scoping attribute; target them through the scoped list. */
-  .prompts :global(li) {
-    padding: 28px 0 30px;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .prompts :global(.meta) { margin: 0 0 10px; }
-
-  .prompts :global(.prompt-text) {
-    max-width: 760px;
-    margin: 0;
-    font-family: var(--serif);
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
-    line-height: 1.2;
-    letter-spacing: -.02em;
-  }
-
   @media (max-width: 760px) {
-    .intro { padding: 62px 0 42px; }
+    .intro { padding: 36px 0 28px; }
   }
 </style>
