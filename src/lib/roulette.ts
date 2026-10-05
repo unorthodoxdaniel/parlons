@@ -36,7 +36,6 @@ export const PREPARATION_SECONDS = [600, 300, 120, 0];
 export const SPEAKING_SECONDS = [60, 150, 300, 600];
 
 export const DEFAULTS = {
-  practiceLang: 'fr',
   theme: RANDOM_THEME,
   preparationSeconds: 600,
   speakingSeconds: 600,
