@@ -46,6 +46,18 @@ consumed once; a failed hide can be retried from the displayed prompt. Cancelled
 sign-in leaves it until expiry or a new hide request replaces it. A new tab does
 not reliably share this intent, so use the original tab to complete the action.
 
+## Practise again
+
+History links to the fixed home route with a session UUID. The authenticated
+client fetches the record under the existing ownership rules, then restores the
+current public prompt, practice language, theme and validated durations. Timers
+do not start automatically. Users can adjust timings and start normally.
+
+The next completed attempt gets a new UUID and history entry. The old entry stays.
+A hidden prompt can be deliberately retried without restoring it to roulette.
+Unavailable records show a message; network errors offer retry. No new migration
+is needed for replay.
+
 ## Account page
 
 `/account/` shows the verified account email, paginated history, and hidden prompts.

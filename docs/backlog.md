@@ -11,6 +11,7 @@
 
 ## Later decisions
 
+- Refine the account/history page within the existing editorial visual system.
 - Optional newsletter invitation, independent from account access.
 - Apple sign-in deferred.
 - Account/data deletion and retention policy before private-history launch.
@@ -21,6 +22,7 @@ See [before-launch.md](before-launch.md) for deployment and launch checks.
 
 ## Completed
 
+- History replay restores prompt and timings, then saves each new attempt separately.
 - Anonymous practice flow, roulette, timers, facelift and optional sound.
 - Email-code and Google sign-in tested locally with real provider configuration.
 - Parlons favicon adapted from the Niel Parle style: italic P, paper background and red square.
