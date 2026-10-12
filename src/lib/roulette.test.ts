@@ -4,6 +4,7 @@ import {
   RANDOM_THEME,
   buildSession,
   eligiblePrompts,
+  initialPracticeLanguage,
   formatDuration,
   matches,
   pickPrompt,
@@ -60,4 +61,11 @@ test('session action and settings', () => {
 
 test('formatDuration', () => {
   assert.deepEqual([60, 150, 300, 600, 120].map(formatDuration), ['1 min', '2:30', '5 min', '10 min', '2 min']);
+});
+
+test('practice-language choice wins over browser preferences and unsupported locales stay unselected', () => {
+  assert.equal(initialPracticeLanguage('fr',['en-US']), 'fr');
+  assert.equal(initialPracticeLanguage(null,['fr-CA','en']), 'fr');
+  assert.equal(initialPracticeLanguage('de',['de-DE','en-GB']), 'en');
+  assert.equal(initialPracticeLanguage(null,['es-ES']), '');
 });

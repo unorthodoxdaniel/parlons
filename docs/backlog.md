@@ -28,3 +28,6 @@ See [before-launch.md](before-launch.md) for deployment and launch checks.
 - Parlons favicon adapted from the Niel Parle style: italic P, paper background and red square.
 
 - Private practice batch implemented on `feature/practice-history`: account identity, history, prompt hiding/undo and anonymous sign-in continuation. Migration tested with isolated two-user RLS checks.
+
+- Practice language remembers an explicit choice per browser, otherwise uses the first supported browser language. Interface language remains independent.
+- Plan an original, reviewed prompt bank across varied topics and speaking tasks, with duplicate checks and a repeatable import process.

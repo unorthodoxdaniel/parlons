@@ -97,3 +97,13 @@ export function buildSession(
 ): Session {
   return { prompt, preparationSeconds, speakingSeconds, next: sessionAction(preparationSeconds) };
 }
+
+/** Explicit practice choice wins; otherwise try supported browser preferences. */
+export function initialPracticeLanguage(saved: string | null, languages: readonly string[]): string {
+  if (saved === 'fr' || saved === 'en') return saved;
+  for (const language of languages) {
+    const code = language.toLowerCase().split('-')[0];
+    if (code === 'fr' || code === 'en') return code;
+  }
+  return '';
+}

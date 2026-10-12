@@ -116,6 +116,7 @@ import {
     DEFAULTS,
     RANDOM_THEME,
     eligiblePrompts,
+    initialPracticeLanguage,
     matches,
     pickPrompt,
     sessionAction,
@@ -208,13 +209,17 @@ import {
     return document.documentElement.dataset.uiLang === 'fr' ? 'fr' : 'en';
   }
 
-  // Session settings stay in memory until the page is reloaded.
+  const practiceStorageKey='parlons:practice-lang';
+  let savedPracticeLanguage: string | null=null;
+  try {savedPracticeLanguage=localStorage.getItem(practiceStorageKey);}catch{}
+  // Durations stay in memory; the explicit practice-language choice persists.
+
   const state = {
     load: 'loading' as 'loading' | 'ready' | 'error',
     prompts: [] as Prompt[],
     themes: [] as Theme[],
-    // A required explicit choice, independent of interface language.
-    practiceLang: '',
+    // Browser fallback is independent of the interface-language switch.
+    practiceLang: initialPracticeLanguage(savedPracticeLanguage, navigator.languages?.length ? navigator.languages : [navigator.language]),
 
     theme: DEFAULTS.theme,
     preparationSeconds: DEFAULTS.preparationSeconds,
@@ -428,6 +433,7 @@ import {
       const setting = select.dataset.setting as 'practiceLang' | 'theme' | 'preparationSeconds' | 'speakingSeconds';
       if (setting === 'practiceLang') {
         state.practiceLang = select.value;
+        try {if(select.value)localStorage.setItem(practiceStorageKey,select.value);else localStorage.removeItem(practiceStorageKey);}catch{}
 
       } else if (setting === 'theme') state.theme = select.value;
       else state[setting] = Number(select.value);
