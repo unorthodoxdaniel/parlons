@@ -11,10 +11,11 @@ import {
 } from '../lib/roulette';
 ---
 
+<noscript><p><T k="noScript" /></p></noscript>
 <div class="panel">
   <section class="stage" aria-labelledby="stage-heading">
     <div class="rule-heading">
-      <h2 id="stage-heading"><T k="stageHeading" /></h2>
+      <h2 id="stage-heading" tabindex="-1"><T k="stageHeading" /></h2>
     </div>
 
     <div id="stage-body" class="stage-body" role="status" aria-live="polite" aria-atomic="true">
@@ -26,9 +27,16 @@ import {
     <div class="actions">
       <button type="button" id="retry" class="text-action primary" hidden><T k="retry" /></button>
       <button type="button" id="spin" class="text-action primary" aria-disabled="true"><T k="spin" /></button>
-      <button type="button" id="session" class="text-action primary" aria-disabled="true" aria-describedby="session-note" hidden></button>
+      <button type="button" id="session" class="text-action primary" aria-disabled="true" hidden></button>
     </div>
-    <p id="session-note" class="session-note" hidden><T k="sessionSoon" /></p>
+    <div id="session-controls" hidden>
+      <p id="timer" role="timer" aria-live="off">10:00</p>
+      <p id="paused" hidden><T k="paused" /></p>
+      <div class="actions">
+        <button id="pause" class="text-action" type="button"><T k="pause" /></button>
+        <button id="advance" class="text-action primary" type="button"></button>
+      </div>
+    </div>
   </section>
 
   <section class="settings" aria-labelledby="settings-heading">
@@ -41,6 +49,7 @@ import {
         <label for="practice-language" class="eyebrow"><T k="practiceLanguage" /></label>
         <div class="select">
           <select id="practice-language" data-setting="practiceLang" autocomplete="off">
+            <option value="" data-en={ui.en.chooseLanguage} data-fr={ui.fr.chooseLanguage}>{ui.en.chooseLanguage}</option>
             {PRACTICE_LANGUAGES.map((option) => (
               <option value={option.value} lang={option.value}>{option.label}</option>
             ))}
@@ -85,13 +94,13 @@ import {
 </div>
 
 <script>
+  import { Countdown, clockText } from '../lib/timer';
   import { createClient } from '@supabase/supabase-js';
   import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from 'astro:env/client';
   import { bilingual, t, themeName, type UiKey } from '../i18n/ui';
   import {
     DEFAULTS,
     RANDOM_THEME,
-    buildSession,
     eligiblePrompts,
     matches,
     pickPrompt,
@@ -108,21 +117,61 @@ import {
   const retryButton = $<HTMLButtonElement>('retry');
   const spinButton = $<HTMLButtonElement>('spin');
   const sessionButton = $<HTMLButtonElement>('session');
-  const sessionNote = $('session-note');
+  const controls = $('session-controls');
+  const heading = $('stage-heading');
+  const timerEl = $('timer');
+  const pauseButton = $<HTMLButtonElement>('pause');
+  const advanceButton = $<HTMLButtonElement>('advance');
+  const pausedEl = $('paused');
+  let phase: 'home' | 'preparation' | 'ready' | 'speaking' | 'finished' = 'home';
+  const timer = new Countdown();
+  let interval: ReturnType<typeof setInterval> | undefined;
+  function stopTicking() { clearInterval(interval); interval = undefined; }
+  function transition(next: typeof phase) {
+    stopTicking();
+    phase = next;
+    if (next === 'preparation' || next === 'speaking') {
+      timer.start(next === 'preparation' ? state.preparationSeconds : state.speakingSeconds);
+      interval = setInterval(tick, 200);
+      tick();
+    }
+    render();
+    heading.focus();
+  }
+  function tick() {
+    timerEl.textContent = clockText(timer.remaining());
+    if (timer.remaining() === 0) transition(phase === 'preparation' ? 'ready' : 'finished');
+  }
+  pauseButton.addEventListener('click', () => {
+    if (timer.paused) timer.resume(); else timer.pause();
+    tick(); render();
+  });
+  advanceButton.addEventListener('click', () => {
+    if (phase === 'preparation') transition('ready');
+    else if (phase === 'ready') transition('speaking');
+    else if (phase === 'speaking') transition('finished');
+    else if (phase === 'finished') {
+      state.prompt = null; state.cleared = false; transition('home');
+      practiceSelect.focus();
+    }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (phase === 'preparation' || phase === 'speaking') tick();
+  });
   const themeSelect = $<HTMLSelectElement>('theme');
 
   function uiLang() {
     return document.documentElement.dataset.uiLang === 'fr' ? 'fr' : 'en';
   }
 
-  // Everything the roulette and the next change (timers) need lives here.
+  // Session settings stay in memory until the page is reloaded.
   const state = {
     load: 'loading' as 'loading' | 'ready' | 'error',
     prompts: [] as Prompt[],
     themes: [] as Theme[],
-    // Starts from the interface language; independent once the user chooses.
-    practiceLang: uiLang(),
-    practiceChosen: false,
+    // A required explicit choice, independent of interface language.
+    practiceLang: '',
+
     theme: DEFAULTS.theme,
     preparationSeconds: DEFAULTS.preparationSeconds,
     speakingSeconds: DEFAULTS.speakingSeconds,
@@ -135,17 +184,32 @@ import {
 
   // --- Data ---------------------------------------------------------------
 
-  const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+
+  async function readPrompts() {
+    const rows: { id: number; text: string; languages: { code: string } | null; themes: { key: string } | null }[] = [];
+    // Supabase limits each response; page through stable ids so every prompt
+    // remains eligible rather than silently sampling the first page only.
+    for (let offset = 0; ; offset += 500) {
+      const result = await supabase.from('prompts')
+        .select('id, text, languages(code), themes(key)').order('id')
+        .range(offset, offset + 499).abortSignal(AbortSignal.timeout(15000));
+      if (result.error) return { data: [], error: result.error };
+      rows.push(...result.data);
+      if (result.data.length < 500) return { data: rows, error: null };
+    }
+  }
 
   async function load() {
     state.load = 'loading';
     render();
+    try {
     const [prompts, themes] = await Promise.all([
-      supabase.from('prompts').select('id, text, languages(code), themes(key)'),
-      supabase.from('themes').select('key, name').order('id'),
+      readPrompts(),
+      supabase.from('themes').select('key, name').order('id').abortSignal(AbortSignal.timeout(15000)),
     ]);
     if (prompts.error || themes.error) {
-      console.error(prompts.error ?? themes.error);
+      // Keep failures recoverable without exposing service details.
       state.load = 'error';
     } else {
       state.prompts = prompts.data.flatMap((row) =>
@@ -157,6 +221,7 @@ import {
       state.load = 'ready';
       renderThemeOptions();
     }
+    } catch { state.load = 'error'; }
     render();
   }
 
@@ -202,7 +267,7 @@ import {
       const setting = select.dataset.setting as 'practiceLang' | 'theme' | 'preparationSeconds' | 'speakingSeconds';
       if (setting === 'practiceLang') {
         state.practiceLang = select.value;
-        state.practiceChosen = true;
+
       } else if (setting === 'theme') state.theme = select.value;
       else state[setting] = Number(select.value);
       dropMismatchedPrompt();
@@ -210,15 +275,10 @@ import {
     });
   });
 
-  // Interface language changed: relabel options and, until the user has chosen
-  // a practice language themselves, keep the practice language in step.
+  // Interface language only relabels controls; practice language never changes.
   new MutationObserver(() => {
     labelOptions();
-    if (!state.practiceChosen && state.practiceLang !== uiLang()) {
-      state.practiceLang = practiceSelect.value = uiLang();
-      dropMismatchedPrompt();
-      render();
-    }
+
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-ui-lang'] });
   labelOptions();
 
@@ -271,11 +331,10 @@ import {
 
   spinButton.addEventListener('click', spin);
 
-  // The next change turns this into the move to the preparation / speaking
-  // screen, using buildSession(). It does not navigate yet.
+  // Start the selected session with its frozen settings.
   sessionButton.addEventListener('click', () => {
     if (sessionButton.getAttribute('aria-disabled') === 'true' || !state.prompt) return;
-    buildSession(state.prompt, state.preparationSeconds, state.speakingSeconds);
+    transition(state.preparationSeconds > 0 ? 'preparation' : 'speaking');
   });
 
   retryButton.addEventListener('click', load);
@@ -299,6 +358,21 @@ import {
   }
 
   function render() {
+    const active = phase !== 'home';
+    document.querySelector<HTMLElement>('.settings')!.hidden = active;
+    controls.hidden = !active;
+    heading.innerHTML = t(active ? phase : 'stageHeading');
+    if (active) {
+      spinButton.hidden = sessionButton.hidden = retryButton.hidden = true;
+      metaEl.hidden = false; textEl.hidden = false;
+      const running = phase === 'preparation' || phase === 'speaking';
+      timerEl.hidden = pauseButton.hidden = !running;
+      pausedEl.hidden = !running || !timer.paused;
+      setButtonLabel(pauseButton, timer.paused ? 'resume' : 'pause');
+      setButtonLabel(advanceButton, phase === 'preparation' ? 'skip' : phase === 'ready' ? 'startSpeaking' : phase === 'speaking' ? 'finish' : 'another');
+      setNote(phase === 'finished' ? 'completeNote' : null);
+      return;
+    }
     const prompt = state.prompt;
     const options = eligible();
 
@@ -315,6 +389,7 @@ import {
     } else if (state.load === 'loading') setNote('loading');
     else if (state.load === 'error') setNote('loadError');
     else if (state.prompts.length === 0) setNote('empty');
+    else if (!state.practiceLang) setNote('needsLanguage');
     else if (options.length === 0) setNote('noMatch');
     else setNote(state.cleared ? 'cleared' : 'placeholder');
 
@@ -328,7 +403,8 @@ import {
     spinButton.classList.toggle('primary', !prompt);
     setButtonLabel(spinButton, prompt ? 'spinAgain' : 'spin');
 
-    sessionButton.hidden = sessionNote.hidden = !prompt;
+    sessionButton.hidden = !prompt;
+    sessionButton.setAttribute('aria-disabled', String(!prompt || state.spinning));
     if (prompt) setButtonLabel(sessionButton, sessionAction(state.preparationSeconds) === 'prepare' ? 'prepare' : 'startSpeaking');
   }
 
@@ -336,6 +412,8 @@ import {
 </script>
 
 <style>
+  [hidden] { display: none !important; }
+  #timer { margin: 24px 0 0; font-size: clamp(4rem, 12vw, 7rem); font-family: var(--serif); line-height: 1.1; font-variant-numeric: tabular-nums; }
   .panel {
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);

@@ -27,7 +27,20 @@ const en = {
   spinAgain: 'Spin again →',
   prepare: 'Prepare →',
   startSpeaking: 'Start speaking →',
-  sessionSoon: 'The timers are coming soon.',
+  preparation: 'Preparation',
+  ready: 'Ready to speak?',
+  speaking: 'Speaking',
+  finished: 'Session complete',
+  pause: 'Pause',
+  resume: 'Resume',
+  skip: 'Skip preparation →',
+  finish: 'Finish early →',
+  another: 'Another prompt →',
+  paused: 'Paused',
+  completeNote: 'You made time to speak. Keep going.',
+  chooseLanguage: 'Choose a language',
+  needsLanguage: 'Choose your practice language, then spin.',
+  noScript: 'Enable JavaScript to use the roulette and timers.',
 };
 
 const fr: Record<keyof typeof en, string> = {
@@ -56,7 +69,20 @@ const fr: Record<keyof typeof en, string> = {
   spinAgain: 'Relancer →',
   prepare: 'Se préparer →',
   startSpeaking: 'Commencer à parler →',
-  sessionSoon: 'Les minuteurs arrivent bientôt.',
+  preparation: 'Préparation',
+  ready: 'Prêt à parler ?',
+  speaking: 'Parole',
+  finished: 'Séance terminée',
+  pause: 'Pause',
+  resume: 'Reprendre',
+  skip: 'Passer la préparation →',
+  finish: 'Terminer maintenant →',
+  another: 'Un autre sujet →',
+  paused: 'En pause',
+  completeNote: 'Tu as pris le temps de parler. Continue comme ça.',
+  chooseLanguage: 'Choisis une langue',
+  needsLanguage: 'Choisis ta langue de pratique, puis lance la roulette.',
+  noScript: 'Active JavaScript pour utiliser la roulette et les minuteurs.',
 };
 
 export const ui = { en, fr };
