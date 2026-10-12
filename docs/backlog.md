@@ -31,3 +31,7 @@ See [before-launch.md](before-launch.md) for deployment and launch checks.
 
 - Practice language remembers an explicit choice per browser, otherwise uses the first supported browser language. Interface language remains independent.
 - Plan an original, reviewed prompt bank across varied topics and speaking tasks, with duplicate checks and a repeatable import process.
+
+- Home now draws an eligible prompt automatically after language/preferences load, without animation, sound or starting a timer.
+- Review [20 prompt drafts](prompt-drafts.md) before expanding the bank.
+- Newsletter: plan optional explicit opt-in and Kit integration, with consent records and no automatic re-subscription of unsubscribed users. No subscription integration implemented yet.

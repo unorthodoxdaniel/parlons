@@ -196,7 +196,7 @@ import {
     else if (phase === 'speaking') transition('finished');
     else if (phase === 'finished') {
       sessionRecord = null; privateMessage = null; $('private-status').textContent = '';
-      state.prompt = null; state.cleared = false; transition('home');
+      state.prompt = null; state.cleared = false; automaticDrawPending=true; transition('home');drawInitialPrompt();
       practiceSelect.focus();
     }
   });
@@ -229,6 +229,8 @@ import {
     spinning: false,
   };
 
+  const entryParams=new URLSearchParams(location.search);
+  let automaticDrawPending=!entryParams.has('practice') && entryParams.get('restore')!=='hide';
   let userId: string | null = null;
   let accountVersion = 0;
   let preferences: 'loading' | 'ready' | 'error' = 'loading';
@@ -335,7 +337,7 @@ import {
       const loadedIds=userId?await hiddenPromptIds(userId):new Set<number>();
       if(version!==accountVersion)return;
       hiddenIds=loadedIds;
-      preferences='ready';render();await restoreIntent();
+      preferences='ready';render();await restoreIntent();drawInitialPrompt();
     }catch{if(version===accountVersion){preferences='error';render();}}
   }
   authClient.auth.onAuthStateChange((event)=>{
@@ -389,6 +391,7 @@ import {
     } catch { state.load = 'error'; }
     render();
     await restoreIntent();
+    drawInitialPrompt();
   }
 
   // --- Controls -----------------------------------------------------------
@@ -440,7 +443,7 @@ import {
       stageBody.style.minHeight = '';
       dropMismatchedPrompt();
       if(setting==='practiceLang'||setting==='theme'){$('hide-invite').hidden=true;privateStatus(null);}
-      render();
+      render();drawInitialPrompt();
     });
   });
 
@@ -454,6 +457,14 @@ import {
   // --- Roulette -----------------------------------------------------------
 
   const eligible = () => eligiblePrompts(state.prompts, state.practiceLang, state.theme).filter(p=>!hiddenIds.has(p.id));
+  function drawInitialPrompt() {
+    if(!automaticDrawPending || phase!=='home' || state.load!=='ready' || preferences!=='ready' || state.prompt || state.spinning)return;
+    const pool=eligible();
+    const prompt=pickPrompt(pool);
+    if(!prompt)return;
+    automaticDrawPending=false;state.prompt=prompt;state.cleared=false;
+    reservePromptSpace(pool);render();
+  }
   const canSpin = () => state.load === 'ready' && preferences === 'ready' && !state.spinning && !hiding && !restoringHistory && eligible().length > 0;
 
   function showPrompt(prompt: Prompt) {
