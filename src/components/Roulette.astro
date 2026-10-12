@@ -95,6 +95,7 @@ import {
     <div class="account-tools">
       <button id="hide-prompt" type="button" hidden><T k="hidePrompt" /></button>
       <p id="private-status" role="status"></p>
+      <button id="replay-retry" type="button" hidden><T k="retry" /></button>
       <button id="save-retry" type="button" hidden><T k="saveRetry" /></button>
       <p id="hide-invite" hidden><T k="hideInvite" /> <a id="hide-sign-in" href="/auth/"><T k="signIn" /></a></p>
       <p id="history-invite" hidden><T k="historyInvite" /> <a href="/auth/"><T k="signIn" /></a></p>
@@ -105,7 +106,7 @@ import {
 <script>
   import {authClient} from '../lib/auth-client';
   import {hidePrompt, hiddenPromptIds} from '../lib/practice-data';
-  import {INTENT_KEY, parseIntent, spokenMilliseconds} from '../lib/practice-rules';
+  import {INTENT_KEY, parseIntent, spokenMilliseconds, replaySettings, validSessionId} from '../lib/practice-rules';
   import { SessionSound } from '../lib/sound';
   import { Countdown, clockText } from '../lib/timer';
   import { createClient } from '@supabase/supabase-js';
@@ -232,6 +233,40 @@ import {
   const pendingSaves=new Set<string>();
   let saveFailed = false;
   let hiding = false;
+  let restoringHistory = false;
+  let replayFailed = false;
+  let replayId: string | null = new URLSearchParams(location.search).get('practice');
+  function clearReplayUrl() {
+    const url=new URL(location.href);url.searchParams.delete('practice');
+    history.replaceState(null,'',url.pathname+url.search+url.hash);
+  }
+  async function restoreHistory() {
+    if(!replayId || restoringHistory || state.load!=='ready' || preferences!=='ready')return;
+    if(!userId || !validSessionId(replayId)){
+      replayId=null;clearReplayUrl();privateStatus('replayUnavailable');render();return;
+    }
+    const owner=userId, version=accountVersion;
+    restoringHistory=true;replayFailed=false;privateStatus('replayLoading');render();
+    try {
+      const {data,error}=await authClient.from('practice_sessions')
+        .select('prompt_id, preparation_seconds, speaking_seconds')
+        .eq('user_id',owner).eq('id',replayId).maybeSingle();
+      if(version!==accountVersion)return;
+      if(error)throw error;
+      const prompt=data?state.prompts.find(p=>p.id===data.prompt_id):null;
+      const settings=data?replaySettings(data):null;
+      if(!prompt || !settings){replayId=null;clearReplayUrl();privateStatus('replayUnavailable');return;}
+      // An intentional replay can use a hidden prompt without un-hiding it.
+      Object.assign(state,settings,{practiceLang:prompt.lang,theme:prompt.theme,prompt,cleared:false});
+      practiceSelect.value=prompt.lang;themeSelect.value=prompt.theme;
+      $<HTMLSelectElement>('preparation').value=String(settings.preparationSeconds);
+      $<HTMLSelectElement>('speaking').value=String(settings.speakingSeconds);
+      replayId=null;clearReplayUrl();privateStatus('replayReady');
+      reservePromptSpace(eligible().concat(prompt));heading.focus();
+    }catch{if(version===accountVersion){replayFailed=true;privateStatus('replayError');}}
+    finally{restoringHistory=false;render();}
+  }
+  $('replay-retry').addEventListener('click',()=>void restoreHistory());
   let sessionRecord: {id:string;user_id:string;prompt_id:number;preparation_seconds:number;speaking_seconds:number;spoken_milliseconds:number;completed_at?:string} | null = null;
   function privateStatus(key: UiKey | null) {
     privateMessage=key; $('private-status').innerHTML=key?t(key):'';
@@ -270,6 +305,7 @@ import {
     catch{event.preventDefault();privateStatus('hideError');}
   });
   async function restoreIntent() {
+    await restoreHistory();
     if(!userId || state.load!=='ready')return;
     const params=new URLSearchParams(location.search);
     if(params.get('restore')!=='hide')return;
@@ -412,7 +448,7 @@ import {
   // --- Roulette -----------------------------------------------------------
 
   const eligible = () => eligiblePrompts(state.prompts, state.practiceLang, state.theme).filter(p=>!hiddenIds.has(p.id));
-  const canSpin = () => state.load === 'ready' && preferences === 'ready' && !state.spinning && !hiding && eligible().length > 0;
+  const canSpin = () => state.load === 'ready' && preferences === 'ready' && !state.spinning && !hiding && !restoringHistory && eligible().length > 0;
 
   function showPrompt(prompt: Prompt) {
     textEl.lang = prompt.lang; // the practice language, never the interface language
@@ -532,6 +568,8 @@ import {
 
   function render() {
     const active = phase !== 'home';
+    $('replay-retry').hidden=!replayFailed || restoringHistory;
+    document.querySelectorAll<HTMLSelectElement>('select[data-setting]').forEach(select=>select.disabled=restoringHistory);
     const hideButton=$<HTMLButtonElement>('hide-prompt');
     hideButton.hidden=!state.prompt || state.spinning || (phase!=='home' && phase!=='finished');
     hideButton.disabled=hiding || (!!state.prompt && hiddenIds.has(state.prompt.id));
@@ -587,7 +625,7 @@ import {
     setButtonLabel(spinButton, prompt ? 'spinAgain' : 'spin');
 
     sessionButton.hidden = !prompt;
-    sessionButton.setAttribute('aria-disabled', String(!prompt || state.spinning));
+    sessionButton.setAttribute('aria-disabled', String(!prompt || state.spinning || restoringHistory));
     if (prompt) setButtonLabel(sessionButton, sessionAction(state.preparationSeconds) === 'prepare' ? 'prepare' : 'startSpeaking');
   }
 

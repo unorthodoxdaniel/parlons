@@ -2,6 +2,11 @@
 // the language being practised. Add keys to both languages.
 
 const en = {
+  practiseAgain: 'Practise again →',
+  replayLoading: 'Restoring your prompt and timings…',
+  replayError: 'Could not restore this session. Try again, or choose another prompt.',
+  replayUnavailable: 'This session or its prompt is unavailable for this account.',
+  replayReady: 'Ready for another attempt. Your previous session stays in your history.',
   account: "Your practice →",
   accountHeading: "Your practice",
   signedInAs: "Signed in as",
@@ -101,6 +106,11 @@ const en = {
 };
 
 const fr: Record<keyof typeof en, string> = {
+  practiseAgain: 'Reprendre ce sujet →',
+  replayLoading: 'Restauration du sujet et des durées…',
+  replayError: 'Impossible de reprendre cette session. Réessaie ou choisis un autre sujet.',
+  replayUnavailable: 'Cette session ou son sujet est indisponible pour ce compte.',
+  replayReady: 'Tout est prêt pour un nouvel essai. Ta session précédente reste dans ton historique.',
   account: "Ta pratique →",
   accountHeading: "Ta pratique",
   signedInAs: "Connecté avec",

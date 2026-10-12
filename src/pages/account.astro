@@ -69,7 +69,11 @@ import T from '../components/T.astro';
         date.textContent=new Date(row.completed_at).toLocaleString(document.documentElement.lang);
         const duration=document.createElement('p'); duration.innerHTML=t('spokenTime');
         duration.append(` · ${clockText(row.spoken_milliseconds)}`);
-        li.append(date,duration,action('deleteSession', async()=>{
+        const replay=document.createElement('a');
+        replay.href=`/?practice=${encodeURIComponent(row.id)}`;
+        replay.innerHTML=t('practiseAgain');
+        replay.dataset.practiceAgain='';
+        li.append(date,duration,replay,action('deleteSession', async()=>{
           const {error}=await authClient.from('practice_sessions').delete().eq('user_id',owner).eq('id',row.id);if(error)throw error;
         })); $('session-list').append(li);
       }
@@ -132,6 +136,6 @@ import T from '../components/T.astro';
   ul :global(li) {border-bottom:1px solid var(--rule);padding:16px 0;}
   ul :global(li p:first-child) {font:400 1.4rem/1.3 var(--serif);}
   ul :global(time), #account-identity {font-size:.85rem;color:var(--muted);overflow-wrap:anywhere;}
-  button,a, ul :global(button) {min-height:44px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:.3em;}
+  button,a, ul :global(button), ul :global(a) {min-height:44px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:.3em;margin-right:20px;}
   [hidden] {display:none!important;}
 </style>
