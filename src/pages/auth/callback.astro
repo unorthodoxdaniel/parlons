@@ -1,0 +1,40 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import T from '../../components/T.astro';
+---
+<Layout title="Parlons">
+  <Header />
+  <main class="site-shell callback">
+    <h1><T k="authCallback" /></h1>
+    <p id="callback-status" role="status"><T k="authBusy" /></p>
+    <a href="/auth/"><T k="signIn" /></a>
+    <a href="/"><T k="authAnonymous" /></a>
+  </main>
+  <Footer />
+</Layout>
+<script>
+  import {authClient} from '../../lib/auth-client';
+  import {t} from '../../i18n/ui';
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  const failed = params.has('error') || new URLSearchParams(location.hash.slice(1)).has('error');
+  // Remove callback credentials and provider messages from the address bar.
+  history.replaceState(null, '', '/auth/callback/');
+  try {
+    if (failed || !code || code.length > 2048) throw new Error('Invalid callback');
+    const {error} = await authClient.auth.exchangeCodeForSession(code);
+    if (error) throw error;
+    const {data, error: userError} = await authClient.auth.getUser();
+    if (userError || !data.user) throw userError;
+    location.replace('/');
+  } catch {
+    document.querySelector('#callback-status')!.innerHTML = t('authCallbackError');
+  }
+</script>
+<style>
+  .callback { max-width: 680px; padding: 64px 0; }
+  h1 { font: 400 2.5rem/1.1 var(--serif); }
+  a { display: block; min-height: 44px; text-decoration: underline; }
+</style>
