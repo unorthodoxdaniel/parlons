@@ -48,7 +48,7 @@ Choose a practice language independently of the FR/EN interface switch. Random
 includes every theme; specific themes come from Supabase. Re-spin avoids the
 previous prompt when another eligible prompt exists. Preparation defaults to
 10 minutes, with 5, 2 and spontaneous options; speaking offers 1, 2:30, 5 and
-10 minutes. Preparation ends at a ready screen; speaking starts explicitly.
+10 minutes, defaulting to 1 minute. Preparation ends at a ready screen; speaking starts explicitly.
 Timers support pause/resume, skip preparation and finish early. Another prompt
 returns home, clears the prompt and keeps settings for this page visit only.
 Reloading resets the session. No recording or session data is stored.
@@ -61,3 +61,8 @@ automatic deadlines, empty/error/retry states, reduced motion and 375px layout
 using mocked Supabase read responses. Keyboard activation and transition focus
 also passed. The configured local Supabase connection loaded successfully;
 production deployment credentials should be checked when releasing.
+
+Sound is off by default. Enable it with the Sound control to hear a brief preview,
+soft roulette ticks and a reveal note, a preparation-end chime and a two-note speaking-end cue. Muting stops active
+cues. Sound uses the browser Web Audio API and stays optional; audio failures
+do not affect the session. The choice lasts for this page visit only.

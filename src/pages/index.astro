@@ -3,39 +3,14 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Roulette from '../components/Roulette.astro';
-import T from '../components/T.astro';
 ---
 
 <Layout>
   <Header />
 
   <main class="site-shell">
-    <section class="intro">
-      <p class="eyebrow"><T k="tagline" /></p>
-      <h1><T k="headline" /></h1>
-    </section>
-
     <Roulette />
   </main>
 
   <Footer />
 </Layout>
-
-<style>
-  .intro { padding: 56px 0 40px; }
-
-  .eyebrow { margin: 0 0 14px; }
-
-  h1 {
-    margin: 0;
-    font-family: var(--serif);
-    font-size: clamp(2.8rem, 6vw, 4.8rem);
-    font-weight: 400;
-    line-height: .9;
-    letter-spacing: -.06em;
-  }
-
-  @media (max-width: 760px) {
-    .intro { padding: 36px 0 28px; }
-  }
-</style>

@@ -38,7 +38,7 @@ export const SPEAKING_SECONDS = [60, 150, 300, 600];
 export const DEFAULTS = {
   theme: RANDOM_THEME,
   preparationSeconds: 600,
-  speakingSeconds: 600,
+  speakingSeconds: 60,
 };
 
 export function formatDuration(seconds: number): string {
