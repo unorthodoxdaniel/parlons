@@ -75,3 +75,5 @@ configuration and provider credentials must be set up separately; local config
 changes do not modify the hosted project. Social buttons remain hidden until
 their `PUBLIC_AUTH_GOOGLE` / `PUBLIC_AUTH_APPLE` flags are enabled. No private
 history or saved-prompt tables are introduced in this batch.
+
+Private practice: [tutorial](docs/private-practice.md), [backlog](docs/backlog.md), and [launch checklist](docs/before-launch.md).

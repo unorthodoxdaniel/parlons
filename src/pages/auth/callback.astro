@@ -15,6 +15,7 @@ import T from '../../components/T.astro';
   <Footer />
 </Layout>
 <script>
+  import {INTENT_KEY,parseIntent} from '../../lib/practice-rules';
   import {authClient} from '../../lib/auth-client';
   import {t} from '../../i18n/ui';
   const params = new URLSearchParams(location.search);
@@ -28,7 +29,8 @@ import T from '../../components/T.astro';
     if (error) throw error;
     const {data, error: userError} = await authClient.auth.getUser();
     if (userError || !data.user) throw userError;
-    location.replace('/');
+    let pending=false;try{pending=!!parseIntent(sessionStorage.getItem(INTENT_KEY));}catch{}
+    location.replace(pending?'/?restore=hide':'/');
   } catch {
     document.querySelector('#callback-status')!.innerHTML = t('authCallbackError');
   }

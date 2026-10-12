@@ -1,0 +1,137 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import T from '../components/T.astro';
+---
+<Layout>
+  <Header />
+  <main class="site-shell account">
+    <h1><T k="accountHeading" /></h1>
+    <p id="account-identity" hidden><T k="signedInAs" /> <span id="account-email"></span></p>
+    <p id="account-status" role="status"><T k="privateLoading" /></p>
+    <a id="account-login" href="/auth/" hidden><T k="signIn" /></a>
+    <button id="account-retry" type="button" hidden><T k="retry" /></button>
+    <div id="account-data" hidden>
+      <section aria-labelledby="history-heading">
+        <h2 id="history-heading"><T k="historyHeading" /></h2>
+        <ul id="session-list"></ul>
+        <button id="history-more" type="button" hidden><T k="historyMore" /></button>
+      </section>
+      <section aria-labelledby="hidden-heading">
+        <h2 id="hidden-heading"><T k="hiddenHeading" /></h2>
+        <ul id="hidden-list"></ul>
+      </section>
+    </div>
+    <a href="/"><T k="another" /></a>
+  </main>
+  <Footer />
+</Layout>
+<script>
+  import {authClient} from '../lib/auth-client';
+  import {t} from '../i18n/ui';
+  import {clockText} from '../lib/timer';
+  const $ = (id: string) => document.getElementById(id)!;
+  let userId: string | null = null;
+  let epoch = 0;
+  let offset = 0;
+  const pageSize = 25;
+  function promptNode(row: any) {
+    const p = document.createElement('p');
+    p.textContent = row.prompts?.text ?? '—';
+    p.lang = row.prompts?.languages?.code ?? '';
+    return p;
+  }
+  function action(key: 'deleteSession' | 'restorePrompt', remove: () => Promise<void>) {
+    const button = document.createElement('button'); button.type = 'button'; button.innerHTML = t(key);
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      try { await remove(); await load(); }
+      catch { $('account-status').innerHTML = t('privateError'); }
+      finally { button.disabled = false; }
+    }); return button;
+  }
+  async function sessions(reset = false) {
+    if (!userId) return;
+    const version = epoch; const owner = userId;
+    if (reset) { offset = 0; $('session-list').replaceChildren(); }
+    try {
+      const {data,error} = await authClient.from('practice_sessions')
+        .select('id, completed_at, spoken_milliseconds, prompts(text, languages(code))')
+        .eq('user_id', owner).order('completed_at', {ascending:false}).order('id')
+        .range(offset, offset + pageSize - 1);
+      if (error) throw error;
+      if (version !== epoch) return;
+      if (!data.length && !offset) $('session-list').innerHTML = `<li>${t('historyEmpty')}</li>`;
+      for (const row of data) {
+        const li=document.createElement('li'); li.append(promptNode(row));
+        const date=document.createElement('time'); date.dateTime=row.completed_at;
+        date.textContent=new Date(row.completed_at).toLocaleString(document.documentElement.lang);
+        const duration=document.createElement('p'); duration.innerHTML=t('spokenTime');
+        duration.append(` · ${clockText(row.spoken_milliseconds)}`);
+        li.append(date,duration,action('deleteSession', async()=>{
+          const {error}=await authClient.from('practice_sessions').delete().eq('user_id',owner).eq('id',row.id);if(error)throw error;
+        })); $('session-list').append(li);
+      }
+      offset += data.length;
+      $('history-more').hidden=data.length < pageSize;
+    } finally { /* Requests from earlier account/language epochs are discarded above. */ }
+  }
+  async function load() {
+    const version=++epoch;
+    $('account-status').innerHTML=t('privateLoading'); $('account-retry').hidden=true;
+    $('account-data').hidden=true; $('account-identity').hidden=true; $('hidden-list').replaceChildren();
+    try {
+      const {data,error}=await authClient.auth.getUser();
+      if (version!==epoch) return;
+      if(error || !data.user) {
+        userId=null; $('account-identity').hidden=true; $('account-status').innerHTML=t('hideInvite');
+        $('account-login').hidden=false; return;
+      }
+      userId=data.user.id; $('account-login').hidden=true;
+      $('account-email').textContent=data.user.email ?? ''; $('account-identity').hidden=false;
+      const owner=userId;
+      // Hidden prompts are paged too; never silently truncate a user's preferences.
+      const rows:any[]=[];
+      for(let start=0;;start+=500){
+        const {data:batch,error}=await authClient.from('hidden_prompts')
+          .select('prompt_id, prompts(text, languages(code))').eq('user_id',owner).order('prompt_id').range(start,start+499);
+        if(error)throw error; rows.push(...batch); if(batch.length<500)break;
+      }
+      if(version!==epoch)return;
+      if(!rows.length)$('hidden-list').innerHTML=`<li>${t('hiddenEmpty')}</li>`;
+      for(const row of rows){
+        const li=document.createElement('li');li.append(promptNode(row),action('restorePrompt',async()=>{
+          const {error}=await authClient.from('hidden_prompts').delete().eq('user_id',owner).eq('prompt_id',row.prompt_id);if(error)throw error;
+        }));$('hidden-list').append(li);
+      }
+      await sessions(true);
+      if(version!==epoch)return;
+      $('account-status').textContent=''; $('account-data').hidden=false;
+    } catch {if(version===epoch){$('account-status').innerHTML=t('privateError');$('account-retry').hidden=false;}}
+  }
+  $('account-retry').addEventListener('click',()=>void load());
+  $('history-more').addEventListener('click',async()=>{
+    const button=$('history-more') as HTMLButtonElement;button.disabled=true;
+    try{await sessions();}catch{$('account-status').innerHTML=t('privateError');}finally{button.disabled=false;}
+  });
+  authClient.auth.onAuthStateChange((event)=>{
+    if(event==='SIGNED_OUT') {epoch++;userId=null;$('account-data').hidden=true;$('account-identity').hidden=true;
+      $('session-list').replaceChildren();$('hidden-list').replaceChildren();$('account-status').innerHTML=t('hideInvite');$('account-login').hidden=false;}
+    else if(event==='SIGNED_IN')setTimeout(()=>void load(),0);
+  });
+  new MutationObserver(()=>void load()).observe(document.documentElement,{attributes:true,attributeFilter:['data-ui-lang']});
+  void load();
+</script>
+<style>
+  .account {max-width:780px;padding:48px 0 64px;}
+  h1 {font:400 3rem/1.1 var(--serif);margin:0 0 24px;}
+  h2 {font:400 1.8rem/1.2 var(--serif);}
+  section {border-top:1px solid var(--rule);margin-top:36px;padding-top:16px;}
+  ul {list-style:none;padding:0;}
+  ul :global(li) {border-bottom:1px solid var(--rule);padding:16px 0;}
+  ul :global(li p:first-child) {font:400 1.4rem/1.3 var(--serif);}
+  ul :global(time), #account-identity {font-size:.85rem;color:var(--muted);overflow-wrap:anywhere;}
+  button,a, ul :global(button) {min-height:44px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:.3em;}
+  [hidden] {display:none!important;}
+</style>

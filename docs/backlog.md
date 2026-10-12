@@ -1,6 +1,6 @@
 # Parlons backlog
 
-## Next: useful accounts
+## Implemented: useful accounts (hosted user verification next)
 
 - Show the signed-in email discreetly so users can identify their account.
 - Save completed practice sessions: prompt, date and actual speaking duration.
@@ -24,3 +24,5 @@ See [before-launch.md](before-launch.md) for deployment and launch checks.
 - Anonymous practice flow, roulette, timers, facelift and optional sound.
 - Email-code and Google sign-in tested locally with real provider configuration.
 - Parlons favicon adapted from the Niel Parle style: italic P, paper background and red square.
+
+- Private practice batch implemented on `feature/practice-history`: account identity, history, prompt hiding/undo and anonymous sign-in continuation. Migration tested with isolated two-user RLS checks.

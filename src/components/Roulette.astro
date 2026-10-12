@@ -92,10 +92,20 @@ import {
         <button id="advance" class="text-action primary" type="button"></button>
       </div>
     </div>
+    <div class="account-tools">
+      <button id="hide-prompt" type="button" hidden><T k="hidePrompt" /></button>
+      <p id="private-status" role="status"></p>
+      <button id="save-retry" type="button" hidden><T k="saveRetry" /></button>
+      <p id="hide-invite" hidden><T k="hideInvite" /> <a id="hide-sign-in" href="/auth/"><T k="signIn" /></a></p>
+      <p id="history-invite" hidden><T k="historyInvite" /> <a href="/auth/"><T k="signIn" /></a></p>
+    </div>
   </section>
 </div>
 
 <script>
+  import {authClient} from '../lib/auth-client';
+  import {hidePrompt, hiddenPromptIds} from '../lib/practice-data';
+  import {INTENT_KEY, parseIntent, spokenMilliseconds} from '../lib/practice-rules';
   import { SessionSound } from '../lib/sound';
   import { Countdown, clockText } from '../lib/timer';
   import { createClient } from '@supabase/supabase-js';
@@ -145,6 +155,11 @@ import {
   let interval: ReturnType<typeof setInterval> | undefined;
   function stopTicking() { clearInterval(interval); interval = undefined; }
   function transition(next: typeof phase) {
+    if (next === 'finished' && phase === 'speaking' && sessionRecord) {
+      sessionRecord.completed_at=new Date().toISOString();
+      sessionRecord.spoken_milliseconds = spokenMilliseconds(state.speakingSeconds, timer.remaining());
+      void saveSession();
+    }
     stopTicking();
     phase = next;
     if (next !== 'home') stageBody.style.minHeight = '';
@@ -178,6 +193,7 @@ import {
     }
     else if (phase === 'speaking') transition('finished');
     else if (phase === 'finished') {
+      sessionRecord = null; privateMessage = null; $('private-status').textContent = '';
       state.prompt = null; state.cleared = false; transition('home');
       practiceSelect.focus();
     }
@@ -206,6 +222,87 @@ import {
     cleared: false, // the last prompt was dropped because settings changed
     spinning: false,
   };
+
+  let userId: string | null = null;
+  let accountVersion = 0;
+  let preferences: 'loading' | 'ready' | 'error' = 'loading';
+  let hiddenIds = new Set<number>();
+  let privateMessage: UiKey | null = null;
+  let saving = false;
+  const pendingSaves=new Set<string>();
+  let saveFailed = false;
+  let hiding = false;
+  let sessionRecord: {id:string;user_id:string;prompt_id:number;preparation_seconds:number;speaking_seconds:number;spoken_milliseconds:number;completed_at?:string} | null = null;
+  function privateStatus(key: UiKey | null) {
+    privateMessage=key; $('private-status').innerHTML=key?t(key):'';
+  }
+  async function saveSession() {
+    const record = sessionRecord;
+    if (!record || record.user_id !== userId || pendingSaves.has(record.id)) return;
+    pendingSaves.add(record.id);saving=true; saveFailed=false; privateStatus('historySaving'); render();
+    try {
+      const {error}=await authClient.from('practice_sessions').insert(record);
+      if(error && error.code!=='23505')throw error;
+      if(record===sessionRecord && record.user_id===userId)privateStatus('historySaved');
+    } catch {
+      if(record===sessionRecord && record.user_id===userId){saveFailed=true;privateStatus('historyError');}
+    } finally {pendingSaves.delete(record.id);if(record===sessionRecord)saving=false;render();}
+  }
+  $('save-retry').addEventListener('click',()=>void saveSession());
+  async function hideSelected() {
+    const prompt=state.prompt; const owner=userId;
+    if(!prompt || !owner || hiding)return;
+    hiding=true; render();
+    try {
+      await hidePrompt(owner,prompt.id);
+      if(owner!==userId)return;
+      hiddenIds.add(prompt.id);privateStatus('hiddenSuccess');
+    } catch {if(owner===userId)privateStatus('hideError');}
+    finally{hiding=false;render();}
+  }
+  $('hide-prompt').addEventListener('click',()=>{
+    if(userId)void hideSelected();
+    else $('hide-invite').hidden=false;
+  });
+  $('hide-sign-in').addEventListener('click',(event)=>{
+    if(!state.prompt)return;
+    try{sessionStorage.setItem(INTENT_KEY,JSON.stringify({promptId:state.prompt.id,expires:Date.now()+15*60_000}));}
+    catch{event.preventDefault();privateStatus('hideError');}
+  });
+  async function restoreIntent() {
+    if(!userId || state.load!=='ready')return;
+    const params=new URLSearchParams(location.search);
+    if(params.get('restore')!=='hide')return;
+    history.replaceState(null,'','/');
+    let intent=null;
+    try{intent=parseIntent(sessionStorage.getItem(INTENT_KEY));sessionStorage.removeItem(INTENT_KEY);}catch{}
+    if(!intent){privateStatus('intentExpired');return;}
+    const prompt=state.prompts.find(p=>p.id===intent.promptId);
+    if(!prompt){privateStatus('hideError');return;}
+    state.practiceLang=prompt.lang;practiceSelect.value=prompt.lang;state.theme=RANDOM_THEME;themeSelect.value=RANDOM_THEME;
+    state.prompt=prompt;render();await hideSelected();heading.focus();
+  }
+  async function refreshAccount() {
+    const version=++accountVersion;
+    preferences='loading';render();
+    try{
+      const {data,error}=await authClient.auth.getUser();
+      if(version!==accountVersion)return;
+      const next=error?null:data.user?.id??null;
+      if(next!==userId){sessionRecord=null;saveFailed=false;privateStatus(null);}
+      userId=next;
+      const loadedIds=userId?await hiddenPromptIds(userId):new Set<number>();
+      if(version!==accountVersion)return;
+      hiddenIds=loadedIds;
+      preferences='ready';render();await restoreIntent();
+    }catch{if(version===accountVersion){preferences='error';render();}}
+  }
+  authClient.auth.onAuthStateChange((event)=>{
+    if(event==='SIGNED_OUT'){
+      ++accountVersion;userId=null;hiddenIds.clear();preferences='ready';sessionRecord=null;saveFailed=false;
+      $('hide-invite').hidden=true;privateStatus(null);render();
+    }else if(event==='SIGNED_IN')setTimeout(()=>void refreshAccount(),0);
+  });
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -250,6 +347,7 @@ import {
     }
     } catch { state.load = 'error'; }
     render();
+    await restoreIntent();
   }
 
   // --- Controls -----------------------------------------------------------
@@ -299,6 +397,7 @@ import {
       else state[setting] = Number(select.value);
       stageBody.style.minHeight = '';
       dropMismatchedPrompt();
+      if(setting==='practiceLang'||setting==='theme'){$('hide-invite').hidden=true;privateStatus(null);}
       render();
     });
   });
@@ -312,8 +411,8 @@ import {
 
   // --- Roulette -----------------------------------------------------------
 
-  const eligible = () => eligiblePrompts(state.prompts, state.practiceLang, state.theme);
-  const canSpin = () => state.load === 'ready' && !state.spinning && eligible().length > 0;
+  const eligible = () => eligiblePrompts(state.prompts, state.practiceLang, state.theme).filter(p=>!hiddenIds.has(p.id));
+  const canSpin = () => state.load === 'ready' && preferences === 'ready' && !state.spinning && !hiding && eligible().length > 0;
 
   function showPrompt(prompt: Prompt) {
     textEl.lang = prompt.lang; // the practice language, never the interface language
@@ -362,6 +461,7 @@ import {
     const pool = eligible();
     reservePromptSpace(pool);
     const chosen = pickPrompt(pool, state.prompt)!;
+    $('hide-invite').hidden=true;privateStatus(null);
     state.cleared = false;
     state.spinning = true;
     state.prompt = null;
@@ -384,7 +484,7 @@ import {
     }
 
     // Settings can change mid-shuffle; never reveal a prompt that no longer fits.
-    const stillFits = matches(chosen, state.practiceLang, state.theme);
+    const stillFits = matches(chosen, state.practiceLang, state.theme) && !hiddenIds.has(chosen.id);
     state.spinning = false;
     state.prompt = stillFits ? chosen : null;
     if (stillFits) sound.play('reveal');
@@ -405,10 +505,12 @@ import {
   sessionButton.addEventListener('click', () => {
     if (sessionButton.getAttribute('aria-disabled') === 'true' || !state.prompt) return;
     if (sound.enabled) void sound.enable();
+    sessionRecord=userId?{id:crypto.randomUUID(),user_id:userId,prompt_id:state.prompt.id,preparation_seconds:state.preparationSeconds,speaking_seconds:state.speakingSeconds,spoken_milliseconds:0}:null;
+    saving=false;saveFailed=false; privateStatus(null);
     transition(state.preparationSeconds > 0 ? 'preparation' : 'speaking');
   });
 
-  retryButton.addEventListener('click', load);
+  retryButton.addEventListener('click', ()=>{void load();void refreshAccount();});
 
   // --- Rendering ----------------------------------------------------------
 
@@ -430,6 +532,12 @@ import {
 
   function render() {
     const active = phase !== 'home';
+    const hideButton=$<HTMLButtonElement>('hide-prompt');
+    hideButton.hidden=!state.prompt || state.spinning || (phase!=='home' && phase!=='finished');
+    hideButton.disabled=hiding || (!!state.prompt && hiddenIds.has(state.prompt.id));
+    $('save-retry').hidden=!saveFailed || saving || phase!=='finished';
+    $('history-invite').hidden=phase!=='finished' || !!userId;
+    if(privateMessage)$('private-status').innerHTML=t(privateMessage);
     document.querySelector<HTMLElement>('.panel')!.dataset.phase = phase;
     document.querySelector<HTMLElement>('.panel')!.classList.toggle('has-prompt', !!state.prompt || state.spinning);
     document.querySelector<HTMLElement>('.settings')!.hidden = active;
@@ -461,13 +569,15 @@ import {
       metaEl.hidden = !prompt;
     } else if (state.load === 'loading') setNote('loading');
     else if (state.load === 'error') setNote('loadError');
+    else if (preferences === 'loading') setNote('hiddenLoading');
+    else if (preferences === 'error') setNote('privateError');
     else if (state.prompts.length === 0) setNote('empty');
     else if (!state.practiceLang) setNote('needsLanguage');
-    else if (options.length === 0) setNote('noMatch');
+    else if (options.length === 0) setNote(hiddenIds.size?'allHidden':'noMatch');
     else setNote(state.cleared ? 'cleared' : 'placeholder');
 
     textEl.classList.toggle('is-shuffling', state.spinning);
-    retryButton.hidden = state.load !== 'error';
+    retryButton.hidden = state.load !== 'error' && preferences !== 'error';
 
     // Roulette. Once a prompt exists the session action is primary and spinning
     // again is the quieter alternative.
@@ -481,10 +591,14 @@ import {
     if (prompt) setButtonLabel(sessionButton, sessionAction(state.preparationSeconds) === 'prepare' ? 'prepare' : 'startSpeaking');
   }
 
-  load();
+  void load();
+  void refreshAccount();
 </script>
 
 <style>
+  .account-tools {min-height:48px;margin:24px auto 0;max-width:640px;font-size:.85rem;color:var(--muted);}
+  .account-tools p:empty {display:none;}
+  .account-tools button,.account-tools a {min-height:44px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:.3em;}
   [hidden] { display: none !important; }
   .sound-controls { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px 16px; margin: -16px 0 16px; }
   #sound-toggle { min-height: 44px; font-size: .75rem; color: var(--muted); text-underline-offset: .3em; }

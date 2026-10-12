@@ -41,6 +41,7 @@ import { PUBLIC_AUTH_GOOGLE, PUBLIC_AUTH_APPLE, PUBLIC_TURNSTILE_SITE_KEY } from
   <Footer />
 </Layout>
 <script>
+  import {INTENT_KEY,parseIntent} from '../../lib/practice-rules';
   import {authClient} from '../../lib/auth-client';
   import {callbackUrl, validCode, validEmail} from '../../lib/auth-rules';
   import {t, type UiKey} from '../../i18n/ui';
@@ -108,6 +109,7 @@ import { PUBLIC_AUTH_GOOGLE, PUBLIC_AUTH_APPLE, PUBLIC_TURNSTILE_SITE_KEY } from
       verified = true;
       document.querySelector<HTMLElement>('#auth-options')!.hidden = true;
       statusEl.innerHTML = t('authSuccess');
+      try{if(parseIntent(sessionStorage.getItem(INTENT_KEY))){location.replace('/?restore=hide');return;}}catch{}
       document.querySelector<HTMLElement>('.anonymous')!.focus();
     } catch { statusEl.innerHTML = ''; error('codeError'); codeInput.value = ''; }
     finally { busy(false); }
@@ -132,6 +134,7 @@ import { PUBLIC_AUTH_GOOGLE, PUBLIC_AUTH_APPLE, PUBLIC_TURNSTILE_SITE_KEY } from
     if (data.user && !pending && !verified) {
       document.querySelector<HTMLElement>('#auth-options')!.hidden = true;
       statusEl.innerHTML = t('authSuccess');
+      try{if(parseIntent(sessionStorage.getItem(INTENT_KEY))){location.replace('/?restore=hide');return;}}catch{}
     }
   }).catch(() => {});
 </script>

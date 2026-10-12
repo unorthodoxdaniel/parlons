@@ -7,6 +7,7 @@ import T from './T.astro';
 
   <div class="header-controls">
     <a id="header-sign-in" class="account-action" href="/auth/" hidden><T k="signIn" /></a>
+    <a id="header-account" class="account-action" href="/account/" hidden><T k="account" /></a>
     <button id="header-sign-out" class="account-action" type="button" hidden><T k="signOut" /></button>
   <div class="lang-switch meta" role="group" aria-labelledby="lang-switch-label">
     <span id="lang-switch-label" class="sr-only"><T k="interfaceLanguage" /></span>
@@ -26,6 +27,7 @@ import T from './T.astro';
   function accountState(signedIn: boolean) {
     signIn.hidden = signedIn;
     signOut.hidden = !signedIn;
+    document.querySelector<HTMLElement>('#header-account')!.hidden = !signedIn;
   }
   authClient.auth.onAuthStateChange((_event, session) => accountState(!!session));
   authClient.auth.getUser().then(({data}) => accountState(!!data.user)).catch(() => accountState(false));
