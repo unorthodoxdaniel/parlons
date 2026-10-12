@@ -1,0 +1,154 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import T from '../../components/T.astro';
+import { PUBLIC_AUTH_GOOGLE, PUBLIC_AUTH_APPLE, PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+---
+<Layout title="Parlons — Sign in / Connexion">
+  <Header />
+  <main class="site-shell auth-shell">
+    <h1><T k="authHeading" /></h1>
+    <p class="intro"><T k="authIntro" /></p>
+    <noscript><p><T k="noScript" /></p></noscript>
+    <div id="auth-options">
+      {(PUBLIC_AUTH_GOOGLE || PUBLIC_AUTH_APPLE) && <div class="providers">
+        {PUBLIC_AUTH_GOOGLE && <button type="button" data-provider="google" class="auth-button"><T k="authGoogle" /></button>}
+        {PUBLIC_AUTH_APPLE && <button type="button" data-provider="apple" class="auth-button"><T k="authApple" /></button>}
+      </div>}
+      {PUBLIC_TURNSTILE_SITE_KEY && <div id="auth-captcha" class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-theme="light" data-size="flexible"></div>}
+      {PUBLIC_TURNSTILE_SITE_KEY && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+      <form id="email-form" method="post" action="/auth/">
+        <label for="auth-email" class="eyebrow"><T k="email" /></label>
+        <input id="auth-email" name="email" type="email" autocomplete="email" maxlength="254" required />
+        <button class="auth-button" type="submit"><T k="sendCode" /></button>
+      </form>
+      <form id="code-form" method="post" action="/auth/" hidden>
+        <label for="auth-code" class="eyebrow"><T k="code" /></label>
+        <p id="code-help"><T k="codeHint" /></p>
+        <input id="auth-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" aria-describedby="code-help" required />
+        <button class="auth-button" type="submit"><T k="verifyCode" /></button>
+        <div class="secondary-actions">
+          <button id="resend-code" type="button"><T k="resendCode" /></button>
+          <button id="change-email" type="button"><T k="changeEmail" /></button>
+        </div>
+      </form>
+    </div>
+    <p id="auth-status" role="status" aria-live="polite"></p>
+    <p id="auth-error" role="alert" hidden></p>
+    <a class="anonymous" href="/"><T k="authAnonymous" /></a>
+  </main>
+  <Footer />
+</Layout>
+<script>
+  import {authClient} from '../../lib/auth-client';
+  import {callbackUrl, validCode, validEmail} from '../../lib/auth-rules';
+  import {t, type UiKey} from '../../i18n/ui';
+  import {PUBLIC_TURNSTILE_SITE_KEY} from 'astro:env/client';
+  const emailForm = document.querySelector<HTMLFormElement>('#email-form')!;
+  const codeForm = document.querySelector<HTMLFormElement>('#code-form')!;
+  const emailInput = document.querySelector<HTMLInputElement>('#auth-email')!;
+  const codeInput = document.querySelector<HTMLInputElement>('#auth-code')!;
+  const errorEl = document.querySelector<HTMLElement>('#auth-error')!;
+  const statusEl = document.querySelector<HTMLElement>('#auth-status')!;
+  const resend = document.querySelector<HTMLButtonElement>('#resend-code')!;
+  let email = '';
+  let pending = false;
+  let resendAt = 0;
+  let verified = false;
+  function error(key: UiKey | null) { errorEl.hidden = !key; errorEl.innerHTML = key ? t(key) : ''; }
+  function busy(value: boolean) {
+    pending = value;
+    document.querySelectorAll<HTMLButtonElement>('#auth-options button').forEach(button => button.disabled = value);
+    emailInput.disabled = codeInput.disabled = value;
+    document.querySelector('#auth-options')!.setAttribute('aria-busy', String(value));
+    resend.disabled = value || Date.now() < resendAt;
+  }
+  setInterval(() => { resend.disabled = pending || Date.now() < resendAt; }, 1000);
+  async function requestCode() {
+    if (pending) return;
+    if (Date.now() < resendAt) { error('resendWait'); return; }
+    const address = emailInput.value.trim();
+    if (!validEmail(address)) { error('authInvalidEmail'); emailInput.focus(); return; }
+    const captchaToken = document.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]')?.value;
+    if (PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) { error('authCaptcha'); return; }
+    busy(true); error(null); statusEl.innerHTML = t('authBusy');
+    try {
+      const {error: failure} = await authClient.auth.signInWithOtp({email: address, options: {shouldCreateUser: true, emailRedirectTo: callbackUrl(location.origin), captchaToken}});
+      if (failure) throw failure;
+      email = address; resendAt = Date.now() + 60000;
+      emailForm.hidden = true; codeForm.hidden = false;
+      statusEl.innerHTML = t('codeSent');
+      busy(false); codeInput.focus();
+    } catch { statusEl.innerHTML = ''; error('authError'); }
+    finally {
+      busy(false);
+      const turnstile = (window as Window & {turnstile?: {reset: (container: string) => void}}).turnstile;
+      if (PUBLIC_TURNSTILE_SITE_KEY && turnstile) turnstile.reset('#auth-captcha');
+    }
+  }
+  emailForm.addEventListener('submit', event => {event.preventDefault(); void requestCode();});
+  resend.addEventListener('click', () => void requestCode());
+  document.querySelector('#change-email')!.addEventListener('click', () => {
+    if (pending) return;
+    codeForm.hidden = true; emailForm.hidden = false; codeInput.value = '';
+    error(null); statusEl.innerHTML = ''; emailInput.focus();
+  });
+  codeForm.addEventListener('submit', async event => {
+    event.preventDefault(); if (pending) return;
+    const code = codeInput.value.trim();
+    if (!validCode(code)) { error('authInvalidCode'); return; }
+    busy(true); error(null); statusEl.innerHTML = t('authBusy');
+    try {
+      const {error: failure} = await authClient.auth.verifyOtp({email, token: code, type: 'email'});
+      if (failure) throw failure;
+      // Ask Auth to verify the session before reporting success.
+      const {data, error: userError} = await authClient.auth.getUser();
+      if (userError || !data.user) throw userError;
+      verified = true;
+      document.querySelector<HTMLElement>('#auth-options')!.hidden = true;
+      statusEl.innerHTML = t('authSuccess');
+      document.querySelector<HTMLElement>('.anonymous')!.focus();
+    } catch { statusEl.innerHTML = ''; error('codeError'); codeInput.value = ''; }
+    finally { busy(false); }
+  });
+  document.querySelectorAll<HTMLButtonElement>('[data-provider]').forEach(button => button.addEventListener('click', async () => {
+    if (pending) return; busy(true); error(null); statusEl.innerHTML = t('authBusy');
+    try {
+      const provider = button.dataset.provider as 'google' | 'apple';
+      const {error: failure} = await authClient.auth.signInWithOAuth({provider, options: {redirectTo: callbackUrl(location.origin)}});
+      if (failure) throw failure;
+    } catch {error('authError'); statusEl.innerHTML = ''; busy(false);}
+  }));
+  authClient.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') {
+      verified = false; codeInput.value = ''; emailInput.value = ''; email = '';
+      emailForm.hidden = false; codeForm.hidden = true;
+      document.querySelector<HTMLElement>('#auth-options')!.hidden = false;
+      error(null); statusEl.innerHTML = '';
+    }
+  });
+  authClient.auth.getUser().then(({data}) => {
+    if (data.user && !pending && !verified) {
+      document.querySelector<HTMLElement>('#auth-options')!.hidden = true;
+      statusEl.innerHTML = t('authSuccess');
+    }
+  }).catch(() => {});
+</script>
+<style>
+  .auth-shell { max-width: 540px; padding: 64px 0 72px; }
+  h1 { font: 400 clamp(2.5rem, 6vw, 4rem)/1.05 var(--serif); letter-spacing: -.04em; margin: 0 0 24px; }
+  .intro { color: var(--muted); margin-bottom: 32px; }
+  form { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  input { width: 100%; min-height: 48px; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); padding: 8px 0; }
+  #auth-code { font-size: 1.5rem; letter-spacing: .16em; }
+  .auth-button { min-height: 48px; background: var(--ink); color: var(--paper); padding: 8px 24px; font: 1.2rem var(--serif); }
+  .auth-button:disabled { background: var(--rule); color: var(--ink); }
+  .providers { display: flex; flex-direction: column; gap: 12px; padding-bottom: 28px; margin-bottom: 28px; border-bottom: 1px solid var(--rule); }
+  .secondary-actions { display: flex; gap: 8px 24px; flex-wrap: wrap; }
+  .secondary-actions button, .anonymous { min-height: 44px; display: inline-flex; align-items: center; font-size: .9rem; text-decoration: underline; text-underline-offset: .3em; }
+  #code-help { margin: 0; color: var(--muted); }
+  #auth-error { color: var(--error); }
+  #auth-status { min-height: 1.6em; }
+  @media(max-width:640px) { .auth-shell { padding: 40px 0 48px; } }
+</style>

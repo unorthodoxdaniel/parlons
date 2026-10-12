@@ -66,3 +66,12 @@ Sound is off by default. Enable it with the Sound control to hear a brief previe
 soft roulette ticks and a reveal note, a preparation-end chime and a two-note speaking-end cue. Muting stops active
 cues. Sound uses the browser Web Audio API and stays optional; audio failures
 do not affect the session. The choice lasts for this page visit only.
+
+## Authentication
+
+Email-code sign-in and optional Google/Apple OAuth are documented in
+[the authentication tutorial](docs/authentication.md). Hosted Supabase email
+configuration and provider credentials must be set up separately; local config
+changes do not modify the hosted project. Social buttons remain hidden until
+their `PUBLIC_AUTH_GOOGLE` / `PUBLIC_AUTH_APPLE` flags are enabled. No private
+history or saved-prompt tables are introduced in this batch.

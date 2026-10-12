@@ -5,15 +5,40 @@ import T from './T.astro';
 <header class="site-header site-shell">
   <a class="brand" href="/">Parlons</a>
 
+  <div class="header-controls">
+    <a id="header-sign-in" class="account-action" href="/auth/" hidden><T k="signIn" /></a>
+    <button id="header-sign-out" class="account-action" type="button" hidden><T k="signOut" /></button>
   <div class="lang-switch meta" role="group" aria-labelledby="lang-switch-label">
     <span id="lang-switch-label" class="sr-only"><T k="interfaceLanguage" /></span>
     <button type="button" lang="fr" aria-label="Français" data-ui-lang-choice="fr" aria-pressed="false">FR</button>
     <span aria-hidden="true">/</span>
     <button type="button" lang="en" aria-label="English" data-ui-lang-choice="en" aria-pressed="true">EN</button>
   </div>
+  </div>
 </header>
+<p id="header-auth-error" class="site-shell" role="alert" hidden><T k="signOutError" /></p>
 
 <script>
+  import {authClient} from '../lib/auth-client';
+  const signIn = document.querySelector<HTMLElement>('#header-sign-in')!;
+  const signOut = document.querySelector<HTMLButtonElement>('#header-sign-out')!;
+  const authError = document.querySelector<HTMLElement>('#header-auth-error')!;
+  function accountState(signedIn: boolean) {
+    signIn.hidden = signedIn;
+    signOut.hidden = !signedIn;
+  }
+  authClient.auth.onAuthStateChange((_event, session) => accountState(!!session));
+  authClient.auth.getUser().then(({data}) => accountState(!!data.user)).catch(() => accountState(false));
+  signOut.addEventListener('click', async () => {
+    signOut.disabled = true; authError.hidden = true;
+    try {
+      const {error} = await authClient.auth.signOut({scope: 'local'});
+      if (error) throw error;
+      accountState(false);
+    } catch {authError.hidden = false;}
+    finally {signOut.disabled = false;}
+  });
+
   // Persist an explicit interface-language choice. This only affects interface
   // strings; it never touches the language being practised.
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-ui-lang-choice]');
@@ -47,6 +72,10 @@ import T from './T.astro';
     border-bottom: 1px solid var(--ink);
   }
 
+  .header-controls { display: flex; align-items: center; gap: 20px; }
+  .account-action { min-height: 44px; display: inline-flex; align-items: center; font-size: .8rem; text-decoration: underline; text-underline-offset: .3em; }
+  #header-auth-error { color: var(--error); font-size: .85rem; }
+  @media(max-width:640px) { .header-controls { gap: 8px; } .account-action { font-size: .72rem; } }
   .brand {
     font-family: var(--serif);
     font-size: 1.45rem;
