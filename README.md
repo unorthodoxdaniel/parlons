@@ -41,3 +41,23 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Anonymous practice
+
+Choose a practice language independently of the FR/EN interface switch. Random
+includes every theme; specific themes come from Supabase. Re-spin avoids the
+previous prompt when another eligible prompt exists. Preparation defaults to
+10 minutes, with 5, 2 and spontaneous options; speaking offers 1, 2:30, 5 and
+10 minutes. Preparation ends at a ready screen; speaking starts explicitly.
+Timers support pause/resume, skip preparation and finish early. Another prompt
+returns home, clears the prompt and keeps settings for this page visit only.
+Reloading resets the session. No recording or session data is stored.
+
+Run `npm test` for filtering and deadline timer tests and `npm run build` for
+the production build. Browser verification covered both interface languages,
+independent practice language, theme filtering, re-spin, constraint invalidation,
+preparation/ready/speaking/completion, pause/resume, spontaneous preparation,
+automatic deadlines, empty/error/retry states, reduced motion and 375px layout
+using mocked Supabase read responses. Keyboard activation and transition focus
+also passed. The configured local Supabase connection loaded successfully;
+production deployment credentials should be checked when releasing.
