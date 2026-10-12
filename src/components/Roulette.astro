@@ -164,7 +164,7 @@ import {
     }
     stopTicking();
     phase = next;
-    if (next !== 'home') stageBody.style.minHeight = '';
+    if (next !== 'home') {stageBody.style.minHeight = '';textEl.style.fontSize = '';}
     if (next === 'preparation' || next === 'speaking') {
       timer.start(next === 'preparation' ? state.preparationSeconds : state.speakingSeconds);
       interval = setInterval(tick, 200);
@@ -230,6 +230,7 @@ import {
   };
 
   const entryParams=new URLSearchParams(location.search);
+  let settingsRevision=0;
   let automaticDrawPending=!entryParams.has('practice') && entryParams.get('restore')!=='hide';
   let userId: string | null = null;
   let accountVersion = 0;
@@ -269,7 +270,7 @@ import {
       $<HTMLSelectElement>('preparation').value=String(settings.preparationSeconds);
       $<HTMLSelectElement>('speaking').value=String(settings.speakingSeconds);
       replayId=null;clearReplayUrl();privateStatus('replayReady');
-      reservePromptSpace(eligible().concat(prompt));heading.focus();
+      reservePromptSpace([prompt]);heading.focus();
     }catch{if(version===accountVersion){replayFailed=true;privateStatus('replayError');}}
     finally{restoringHistory=false;render();}
   }
@@ -443,6 +444,7 @@ import {
       stageBody.style.minHeight = '';
       dropMismatchedPrompt();
       if(setting==='practiceLang'||setting==='theme'){$('hide-invite').hidden=true;privateStatus(null);}
+      settingsRevision++;automaticDrawPending=true;
       render();drawInitialPrompt();
     });
   });
@@ -458,12 +460,8 @@ import {
 
   const eligible = () => eligiblePrompts(state.prompts, state.practiceLang, state.theme).filter(p=>!hiddenIds.has(p.id));
   function drawInitialPrompt() {
-    if(!automaticDrawPending || phase!=='home' || state.load!=='ready' || preferences!=='ready' || state.prompt || state.spinning)return;
-    const pool=eligible();
-    const prompt=pickPrompt(pool);
-    if(!prompt)return;
-    automaticDrawPending=false;state.prompt=prompt;state.cleared=false;
-    reservePromptSpace(pool);render();
+    if(!automaticDrawPending || phase!=='home' || !canSpin())return;
+    void spin();
   }
   const canSpin = () => state.load === 'ready' && preferences === 'ready' && !state.spinning && !hiding && !restoringHistory && eligible().length > 0;
 
@@ -477,15 +475,23 @@ import {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  function reservePromptSpace(pool: Prompt[]) {
-    // Measure every eligible prompt at the current width before shuffling.
-    // Reserve the tallest reveal so neither actions nor footer follow each frame.
+  function reservePromptSpace(pool: Prompt[], shuffling = false) {
+    // Fit only the selected prompt at reveal. The shuffle has its own compact,
+    // fixed slot so intermediate frames cannot move the actions.
+    stageBody.style.minHeight = '';
+    textEl.style.fontSize = '';
+    const panel = document.querySelector<HTMLElement>('.panel')!;
+    const actions = panel.querySelector<HTMLElement>('.stage > .actions')!;
+    const account = panel.querySelector<HTMLElement>('.account-tools')!;
+    const footer = document.querySelector<HTMLElement>('footer')!;
+    const below = actions.getBoundingClientRect().height + parseFloat(getComputedStyle(actions).marginTop)
+      + account.getBoundingClientRect().height + parseFloat(getComputedStyle(account).marginTop)
+      + parseFloat(getComputedStyle(panel).paddingBottom) + footer.getBoundingClientRect().height;
+    const available = Math.max(0, window.innerHeight - (stageBody.getBoundingClientRect().top + window.scrollY) - below - 2);
     const measure = stageBody.cloneNode(true) as HTMLElement;
-    measure.removeAttribute('id');
-    measure.removeAttribute('role');
-    measure.removeAttribute('aria-live');
+    measure.removeAttribute('id');measure.removeAttribute('role');measure.removeAttribute('aria-live');
     measure.setAttribute('aria-hidden', 'true');
-    measure.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+    measure.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
     Object.assign(measure.style, {
       position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
       width: `${stageBody.getBoundingClientRect().width}px`, minHeight: '0',
@@ -493,33 +499,48 @@ import {
     const text = measure.querySelector<HTMLElement>('.prompt-text')!;
     const meta = measure.querySelector<HTMLElement>('.meta')!;
     text.hidden = meta.hidden = false;
-    meta.textContent = 'Theme';
+    meta.textContent = themeName(pool[0]?.theme ?? '', '').en;
     measure.querySelector<HTMLElement>('.prompt-mark')!.style.display = 'block';
     measure.querySelector<HTMLElement>('.stage-note')!.hidden = true;
     stageBody.parentElement!.append(measure);
-    let height = stageBody.getBoundingClientRect().height;
-    for (const prompt of pool) {
-      text.lang = prompt.lang;
-      text.textContent = prompt.lang === 'fr' ? prompt.text.replace(/ ([?!:;»])/g, ' $1') : prompt.text;
-      height = Math.max(height, measure.getBoundingClientRect().height);
+    const preferred = parseFloat(getComputedStyle(textEl).fontSize);
+    // A rem-based floor preserves enlarged browser text instead of clipping it.
+    const minimum = 1.5 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    let size = Math.max(minimum, shuffling ? Math.min(preferred, 32) : preferred);
+    function heightAt(fontSize: number) {
+      text.style.fontSize = `${fontSize}px`;
+      let height = 0;
+      for (const prompt of pool) {
+        text.lang = prompt.lang;
+        text.textContent = prompt.lang === 'fr' ? prompt.text.replace(/ ([?!:;»])/g, ' $1') : prompt.text;
+        height = Math.max(height, measure.getBoundingClientRect().height);
+      }
+      return height;
+    }
+    let height = heightAt(size);
+    while (height > available && size > minimum) {
+      size = Math.max(minimum, size - 1);
+      height = heightAt(size);
     }
     measure.remove();
+    textEl.style.fontSize = `${size}px`;
     stageBody.style.minHeight = `${Math.ceil(height)}px`;
   }
 
   async function spin() {
     if (!canSpin()) return;
+    state.spinning=true;
     if (sound.enabled) await sound.enable();
-    if (!canSpin()) return;
     const pool = eligible();
-    reservePromptSpace(pool);
+    if(!pool.length || preferences!=='ready' || phase!=='home'){state.spinning=false;render();return;}
+    const revision=settingsRevision;automaticDrawPending=false;
     const chosen = pickPrompt(pool, state.prompt)!;
     $('hide-invite').hidden=true;privateStatus(null);
     state.cleared = false;
-    state.spinning = true;
     state.prompt = null;
     stageBody.setAttribute('aria-busy', 'true');
     render();
+    reservePromptSpace(pool, true);
 
     // A short shuffle through eligible prompts, slowing to a stop. Skipped
     // entirely under prefers-reduced-motion.
@@ -528,7 +549,7 @@ import {
       for (const delay of [70, 70, 80, 95, 115, 145, 190]) {
         const frame = pickPrompt(pool, last)!;
         last = frame;
-        if (reducedMotion.matches) break;
+        if (reducedMotion.matches || revision!==settingsRevision) break;
         sound.play('tick');
         showPrompt(frame);
         textEl.hidden = false;
@@ -537,20 +558,25 @@ import {
     }
 
     // Settings can change mid-shuffle; never reveal a prompt that no longer fits.
-    const stillFits = matches(chosen, state.practiceLang, state.theme) && !hiddenIds.has(chosen.id);
+    const stillFits = revision===settingsRevision && matches(chosen, state.practiceLang, state.theme) && !hiddenIds.has(chosen.id);
     state.spinning = false;
     state.prompt = stillFits ? chosen : null;
     if (stillFits) sound.play('reveal');
     state.cleared = !stillFits;
     stageBody.removeAttribute('aria-busy');
     render();
+    if (state.prompt) {
+      reservePromptSpace([state.prompt]);
+      if (!reducedMotion.matches) textEl.animate([{ opacity: .45 }, { opacity: 1 }], { duration: 180 });
+    }
+    drawInitialPrompt();
   }
 
   spinButton.addEventListener('click', spin);
   window.addEventListener('resize', () => {
     if (phase === 'home' && !state.spinning) {
       stageBody.style.minHeight = '';
-      if (state.prompt) reservePromptSpace(eligible());
+      if (state.prompt) reservePromptSpace([state.prompt]);
     }
   });
 
@@ -651,7 +677,7 @@ import {
 </script>
 
 <style>
-  .account-tools {min-height:48px;margin:24px auto 0;max-width:640px;font-size:.85rem;color:var(--muted);}
+  .account-tools {min-height:48px;margin:12px auto 0;max-width:640px;font-size:.85rem;color:var(--muted);}
   .account-tools p:empty {display:none;}
   .account-tools button,.account-tools a {min-height:44px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:.3em;}
   [hidden] { display: none !important; }
@@ -659,7 +685,7 @@ import {
   #sound-toggle { min-height: 44px; font-size: .75rem; color: var(--muted); text-underline-offset: .3em; }
   #sound-toggle:hover, #sound-toggle[aria-pressed='true'] { color: var(--ink); text-decoration: underline; }
   #sound-status { margin: 0; color: var(--error); font-size: .8rem; }
-  .panel { max-width: 1040px; margin: 0 auto; padding: 32px 0 64px; }
+  .panel { max-width: 1040px; margin: 0 auto; padding: 16px 0 24px; }
   .fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; max-width: 850px; margin: 0 auto; }
   .field { display: flex; flex-direction: column; gap: 2px; }
   .field label { margin: 0; font-size: .65rem; letter-spacing: .08em; }
@@ -667,11 +693,11 @@ import {
   .select::after { content: '↓'; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
   select { width: 100%; min-height: 44px; padding: 0 24px 0 0; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; background: transparent; color: var(--ink); font: inherit; cursor: pointer; appearance: none; }
   select:hover { border-color: var(--ink); }
-  .stage { text-align: center; padding: clamp(48px, 8vh, 84px) 0 0; }
+  .stage { text-align: center; padding: clamp(24px, 4svh, 40px) 0 0; }
   .phase-heading { font-family: var(--sans); font-weight: 400; margin: 0 0 20px; }
   .has-prompt[data-phase='home'] .phase-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .phase-heading:focus-visible { outline-offset: 6px; }
-  .stage-body { max-width: 980px; margin: 0 auto; }
+  .stage-body { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; justify-content: flex-end; }
   .meta { margin: 0 0 8px; }
   .prompt-mark { display: none; color: var(--accent); font: 3rem/1 var(--serif); margin: 4px 0 16px; }
   .has-prompt .prompt-mark { display: block; }
@@ -679,7 +705,7 @@ import {
   .prompt-text.is-shuffling { color: var(--muted); }
   .stage-note { margin: 0 auto; max-width: 650px; font: 400 clamp(1.5rem, 3vw, 2.3rem)/1.2 var(--serif); text-wrap: balance; }
   .actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px 32px; }
-  .stage > .actions { margin-top: 32px; min-height: 64px; flex-direction: row; justify-content: center; }
+  .stage > .actions { margin-top: 24px; min-height: 64px; flex-direction: row; justify-content: center; }
   #session { order: -1; }
   .text-action { padding: 0 8px; text-decoration: none; }
   .text-action.primary { min-height: 48px; padding: 8px 24px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font-size: 1.2rem; line-height: 1.4; justify-content: center; }
@@ -701,11 +727,20 @@ import {
   .panel:not([data-phase='home']) .prompt-mark { font-size: 2.4rem; margin-bottom: 10px; }
   [data-phase='ready'] #session-controls, [data-phase='finished'] #session-controls { margin-top: 40px; }
   [data-phase='finished'] .stage-note { margin-top: 28px; font-size: 1.3rem; color: var(--muted); }
+  @media (max-width: 640px) and (max-height: 740px) {
+    .panel[data-phase='home'] { padding: 8px 0 12px; }
+    .panel[data-phase='home'] .sound-controls { margin-bottom: 8px; }
+    .panel[data-phase='home'] .fields { row-gap: 8px; }
+    .panel[data-phase='home'] .stage { padding-top: 16px; }
+    .panel[data-phase='home'] .prompt-mark { font-size: 2rem; margin-bottom: 12px; }
+    .panel[data-phase='home'] .stage > .actions { margin-top: 16px; }
+    .panel[data-phase='home'] .account-tools { margin-top: 8px; }
+  }
   @media (max-width: 640px) {
-    .panel { padding: 24px 0 48px; }
+    .panel { padding: 16px 0 20px; }
     .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
-    .stage { padding-top: 40px; }
-    .stage > .actions { margin-top: 28px; }
+    .stage { padding-top: 24px; }
+    .stage > .actions { margin-top: 20px; }
     .prompt-text { font-size: clamp(2.3rem, 9vw, 3.5rem); }
     #session-controls { margin-top: 16px; }
     .panel:not([data-phase='home']) .stage { padding-top: 16px; }
