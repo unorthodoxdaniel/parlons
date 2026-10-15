@@ -90,6 +90,7 @@ import {
       <div class="actions">
         <button id="pause" class="text-action" type="button"><T k="pause" /></button>
         <button id="advance" class="text-action primary" type="button"></button>
+        <button id="cancel-session" class="text-action" type="button" hidden><T k="cancelSession" /></button>
       </div>
     </div>
     <div class="account-tools">
@@ -137,6 +138,7 @@ import {
   const timerEl = $('timer');
   const pauseButton = $<HTMLButtonElement>('pause');
   const advanceButton = $<HTMLButtonElement>('advance');
+  const cancelButton = $<HTMLButtonElement>('cancel-session');
   const sound = new SessionSound();
   const soundButton = $<HTMLButtonElement>('sound-toggle');
   soundButton.addEventListener('click', async () => {
@@ -199,6 +201,17 @@ import {
       state.prompt = null; state.cleared = false; automaticDrawPending=true; transition('home');drawInitialPrompt();
       practiceSelect.focus();
     }
+  });
+  cancelButton.addEventListener('click', () => {
+    if (phase !== 'preparation' && phase !== 'ready' && phase !== 'speaking') return;
+    // Leave through home so cancellation never records a completed session.
+    sessionRecord = null;
+    saving = false;
+    saveFailed = false;
+    privateStatus(null);
+    transition('home');
+    if (state.prompt) reservePromptSpace([state.prompt]);
+    sessionButton.focus();
   });
   document.addEventListener('visibilitychange', () => {
     if (phase === 'preparation' || phase === 'speaking') tick();
@@ -623,6 +636,7 @@ import {
     document.querySelector<HTMLElement>('.panel')!.classList.toggle('has-prompt', !!state.prompt || state.spinning);
     document.querySelector<HTMLElement>('.settings')!.hidden = active;
     controls.hidden = !active;
+    cancelButton.hidden = !active || phase === 'finished';
     heading.innerHTML = t(active ? phase : 'stageHeading');
     if (active) {
       spinButton.hidden = sessionButton.hidden = retryButton.hidden = true;
