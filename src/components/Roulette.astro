@@ -488,9 +488,9 @@ import {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  function reservePromptSpace(pool: Prompt[], shuffling = false) {
-    // Fit only the selected prompt at reveal. The shuffle has its own compact,
-    // fixed slot so intermediate frames cannot move the actions.
+  function reservePromptSpace(pool: Prompt[]) {
+    // One type size and stage height for the whole reel, including its result.
+    // Fit the longest eligible prompt so neither text nor controls jump at landing.
     stageBody.style.minHeight = '';
     textEl.style.fontSize = '';
     const panel = document.querySelector<HTMLElement>('.panel')!;
@@ -519,7 +519,7 @@ import {
     const preferred = parseFloat(getComputedStyle(textEl).fontSize);
     // A rem-based floor preserves enlarged browser text instead of clipping it.
     const minimum = 1.5 * parseFloat(getComputedStyle(document.documentElement).fontSize);
-    let size = Math.max(minimum, shuffling ? Math.min(preferred, 32) : preferred);
+    let size = Math.max(minimum, preferred);
     function heightAt(fontSize: number) {
       text.style.fontSize = `${fontSize}px`;
       let height = 0;
@@ -553,7 +553,7 @@ import {
     state.prompt = null;
     stageBody.setAttribute('aria-busy', 'true');
     render();
-    reservePromptSpace(pool, true);
+    reservePromptSpace(pool);
 
     // Cycle like a reel: rapid early frames, then a long, gradual slowdown.
     // Absolute deadlines keep rendering work from extending the 4.7-second spin.
@@ -583,10 +583,9 @@ import {
     stageBody.removeAttribute('aria-busy');
     render();
     if (state.prompt) {
-      reservePromptSpace([state.prompt]);
       if (!reducedMotion.matches) textEl.animate([
-        { opacity: .65, transform: 'translateY(8px) scale(.98)' },
-        { opacity: 1, transform: 'translateY(0) scale(1)' },
+        { opacity: .65, transform: 'translateY(8px)' },
+        { opacity: 1, transform: 'translateY(0)' },
       ], { duration: 550, easing: 'cubic-bezier(.22, 1, .36, 1)' });
     }
     drawInitialPrompt();
@@ -596,7 +595,7 @@ import {
   window.addEventListener('resize', () => {
     if (phase === 'home' && !state.spinning) {
       stageBody.style.minHeight = '';
-      if (state.prompt) reservePromptSpace([state.prompt]);
+      if (state.prompt) reservePromptSpace(eligible());
     }
   });
 
