@@ -23,6 +23,16 @@ import T from '../components/T.astro';
         <ul id="hidden-list"></ul>
       </section>
     </div>
+    <section id="account-delete" aria-labelledby="delete-heading" hidden>
+      <h2 id="delete-heading"><T k="deleteAccount" /></h2>
+      <p id="delete-note"><T k="deleteAccountNote" /></p>
+      <button id="delete-open" type="button" aria-expanded="false" aria-controls="delete-confirm"><T k="deleteAccount" /></button>
+      <div id="delete-confirm" hidden>
+        <button id="delete-submit" type="button" aria-describedby="delete-note"><T k="deleteAccountConfirm" /></button>
+        <button id="delete-cancel" type="button"><T k="deleteAccountCancel" /></button>
+      </div>
+    </section>
+    <p id="delete-status" role="status" tabindex="-1"></p>
     <a href="/"><T k="another" /></a>
   </main>
   <Footer />
@@ -32,6 +42,8 @@ import T from '../components/T.astro';
   import {t} from '../i18n/ui';
   import {clockText} from '../lib/timer';
   const $ = (id: string) => document.getElementById(id)!;
+  let deleting = false;
+  let deleted = false;
   let userId: string | null = null;
   let epoch = 0;
   let offset = 0;
@@ -82,6 +94,8 @@ import T from '../components/T.astro';
     } finally { /* Requests from earlier account/language epochs are discarded above. */ }
   }
   async function load() {
+    if (deleting || deleted) return;
+    $('account-delete').hidden=true;
     const version=++epoch;
     $('account-status').innerHTML=t('privateLoading'); $('account-retry').hidden=true;
     $('account-data').hidden=true; $('account-identity').hidden=true; $('hidden-list').replaceChildren();
@@ -92,7 +106,7 @@ import T from '../components/T.astro';
         userId=null; $('account-identity').hidden=true; $('account-status').innerHTML=t('hideInvite');
         $('account-login').hidden=false; return;
       }
-      userId=data.user.id; $('account-login').hidden=true;
+      userId=data.user.id; $('account-delete').hidden=false; $('account-login').hidden=true;
       $('account-email').textContent=data.user.email ?? ''; $('account-identity').hidden=false;
       const owner=userId;
       // Hidden prompts are paged too; never silently truncate a user's preferences.
@@ -114,13 +128,48 @@ import T from '../components/T.astro';
       $('account-status').textContent=''; $('account-data').hidden=false;
     } catch {if(version===epoch){$('account-status').innerHTML=t('privateError');$('account-retry').hidden=false;}}
   }
+  function confirmation(open: boolean) {
+    $('delete-confirm').hidden=!open;
+    $('delete-open').hidden=open;
+    $('delete-open').setAttribute('aria-expanded',String(open));
+    $(open ? 'delete-cancel' : 'delete-open').focus();
+  }
+  $('delete-open').addEventListener('click',()=>confirmation(true));
+  $('delete-cancel').addEventListener('click',()=>confirmation(false));
+  $('delete-submit').addEventListener('click',async()=>{
+    if(deleting || !userId) return;
+    deleting=true; ++epoch;
+    const owner=userId;
+    const submit=$('delete-submit') as HTMLButtonElement;
+    const cancel=$('delete-cancel') as HTMLButtonElement;
+    submit.disabled=cancel.disabled=true;
+    $('delete-status').innerHTML=t('deleteAccountBusy');
+    try {
+      const {data,error:identityError}=await authClient.auth.getUser();
+      if(identityError || data.user?.id!==owner) throw new Error('identity');
+      const {error}=await authClient.rpc('delete_own_account');
+      if(error) throw error;
+      deleted=true; userId=null; ++epoch;
+      $('account-data').hidden=true; $('account-identity').hidden=true;
+      $('account-delete').hidden=true; $('account-login').hidden=true;
+      $('account-retry').hidden=true; $('account-status').textContent='';
+      $('session-list').replaceChildren(); $('hidden-list').replaceChildren();
+      // Auth deletion has already succeeded; session cleanup must not turn it into an error.
+      try { await authClient.auth.signOut({scope:'local'}); } catch {}
+      $('delete-status').innerHTML=t('deleteAccountSuccess');
+      $('delete-status').focus();
+    } catch {
+      $('delete-status').innerHTML=t('deleteAccountError');
+      $('delete-status').focus();
+    } finally {deleting=false;submit.disabled=cancel.disabled=false;}
+  });
   $('account-retry').addEventListener('click',()=>void load());
   $('history-more').addEventListener('click',async()=>{
     const button=$('history-more') as HTMLButtonElement;button.disabled=true;
     try{await sessions();}catch{$('account-status').innerHTML=t('privateError');}finally{button.disabled=false;}
   });
   authClient.auth.onAuthStateChange((event)=>{
-    if(event==='SIGNED_OUT') {epoch++;userId=null;$('account-data').hidden=true;$('account-identity').hidden=true;
+    if(event==='SIGNED_OUT') {if(deleted)return; $('account-delete').hidden=true; $('delete-confirm').hidden=true; $('delete-open').hidden=false; $('delete-open').setAttribute('aria-expanded','false'); epoch++;userId=null;$('account-data').hidden=true;$('account-identity').hidden=true;
       $('session-list').replaceChildren();$('hidden-list').replaceChildren();$('account-status').innerHTML=t('hideInvite');$('account-login').hidden=false;}
     else if(event==='SIGNED_IN')setTimeout(()=>void load(),0);
   });

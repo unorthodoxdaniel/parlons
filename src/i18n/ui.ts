@@ -2,6 +2,14 @@
 // the language being practised. Add keys to both languages.
 
 const en = {
+  deleteAccount: 'Delete account',
+  deleteAccountNote: 'Permanently delete your account, practice history and hidden prompt preferences. This cannot be undone. You can still practise without an account.',
+  deleteAccountConfirm: 'Permanently delete my account',
+  deleteAccountCancel: 'Keep my account',
+  deleteAccountBusy: 'Deleting your account…',
+  deleteAccountError: 'Could not confirm account deletion. Please try again. If you were signed out, sign in again to check your account.',
+  deleteAccountSuccess: 'Your account has been deleted. You can continue practising without signing in.',
+
   darkMode: 'Dark mode',
   shortcutHints: 'Space: spin · Enter: prepare / start',
   practiseAgain: 'Practise again →',
@@ -109,6 +117,14 @@ const en = {
 };
 
 const fr: Record<keyof typeof en, string> = {
+  deleteAccount: 'Supprimer mon compte',
+  deleteAccountNote: 'Supprime définitivement ton compte, ton historique de pratique et tes préférences de sujets masqués. Cette action est irréversible. Tu pourras toujours pratiquer sans compte.',
+  deleteAccountConfirm: 'Supprimer définitivement mon compte',
+  deleteAccountCancel: 'Garder mon compte',
+  deleteAccountBusy: 'Suppression de ton compte…',
+  deleteAccountError: 'Impossible de confirmer la suppression du compte. Réessaie. Si tu as été déconnecté, reconnecte-toi pour vérifier ton compte.',
+  deleteAccountSuccess: 'Ton compte a été supprimé. Tu peux continuer à pratiquer sans te connecter.',
+
   darkMode: 'Mode sombre',
   shortcutHints: 'Espace : relancer · Entrée : se préparer / commencer',
   practiseAgain: 'Reprendre ce sujet →',

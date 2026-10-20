@@ -13,7 +13,7 @@
 
 - Refine the account/history page within the existing editorial visual system.
 - Apple sign-in deferred.
-- Account/data deletion and retention policy before private-history launch.
+- Account deletion implemented; apply the migration and verify with a disposable hosted account. See [account-deletion.md](account-deletion.md). Publish a retention policy before private-history launch.
 
 ## Planned: newsletter and community suggestions
 
