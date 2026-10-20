@@ -1,11 +1,17 @@
 ---
 import T from './T.astro';
+import Icon from './Icon.astro';
 ---
 
 <header class="site-header site-shell">
   <a class="brand" href="/">Parlons</a>
 
   <div class="header-controls">
+    <button id="theme-toggle" type="button" aria-pressed="false">
+      <span class="sr-only"><T k="darkMode" /></span>
+      <span class="theme-light"><Icon name="sun" /></span>
+      <span class="theme-dark"><Icon name="moon" /></span>
+    </button>
     <a id="header-sign-in" class="account-action" href="/auth/" hidden><T k="signIn" /></a>
     <a id="header-account" class="account-action" href="/account/" hidden><T k="account" /></a>
     <button id="header-sign-out" class="account-action" type="button" hidden><T k="signOut" /></button>
@@ -45,6 +51,20 @@ import T from './T.astro';
   // strings; it never touches the language being practised.
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-ui-lang-choice]');
   const root = document.documentElement;
+  const themeToggle = document.querySelector<HTMLButtonElement>('#theme-toggle')!;
+  const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+  const syncTheme = () => themeToggle.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
+  themeToggle.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('parlons:theme', root.dataset.theme); } catch {}
+    syncTheme();
+  });
+  systemTheme.addEventListener('change', () => {
+    try { if (localStorage.getItem('parlons:theme')) return; } catch {}
+    root.dataset.theme = systemTheme.matches ? 'dark' : 'light';
+    syncTheme();
+  });
+  syncTheme();
 
   const sync = () => {
     for (const button of buttons) {
@@ -75,6 +95,10 @@ import T from './T.astro';
   }
 
   .header-controls { display: flex; align-items: center; gap: 20px; }
+  #theme-toggle { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 6px; }
+  #theme-toggle > span:not(.sr-only) { display: flex; align-items: center; min-height: 32px; color: var(--muted); border-bottom: 1px solid transparent; }
+  :global([data-theme='light']) #theme-toggle .theme-light,
+  :global([data-theme='dark']) #theme-toggle .theme-dark { color: var(--ink); border-bottom-color: var(--ink); }
   .account-action { min-height: 44px; display: inline-flex; align-items: center; font-size: .8rem; text-decoration: underline; text-underline-offset: .3em; }
   #header-auth-error { color: var(--error); font-size: .85rem; }
   @media(max-width:640px) { .header-controls { gap: 8px; } .account-action { font-size: .72rem; } }

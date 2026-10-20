@@ -3,6 +3,7 @@
    nielparle-site/src/styles/global.css. */
 
 :root {
+  color-scheme: light;
   --paper: #f7f5f0;
   --ink: #181818;
   --muted: #6f6c66;
@@ -13,6 +14,17 @@
   --reading-width: 720px;
   --serif: Georgia, "Times New Roman", serif;
   --sans: Arial, Helvetica, sans-serif;
+}
+
+/* Parlons dark counterpart: keep the same editorial roles and warm neutrals. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #1b1a18;
+  --ink: #f2eee5;
+  --muted: #b0aba1;
+  --accent: #ed795f;
+  --error: #f18b76;
+  --rule: #4b4740;
 }
 
 * { box-sizing: border-box; }

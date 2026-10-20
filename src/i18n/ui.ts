@@ -2,6 +2,8 @@
 // the language being practised. Add keys to both languages.
 
 const en = {
+  darkMode: 'Dark mode',
+  shortcutHints: 'Space: spin · Enter: prepare / start',
   practiseAgain: 'Practise again →',
   replayLoading: 'Restoring your prompt and timings…',
   replayError: 'Could not restore this session. Try again, or choose another prompt.',
@@ -107,6 +109,8 @@ const en = {
 };
 
 const fr: Record<keyof typeof en, string> = {
+  darkMode: 'Mode sombre',
+  shortcutHints: 'Espace : relancer · Entrée : se préparer / commencer',
   practiseAgain: 'Reprendre ce sujet →',
   replayLoading: 'Restauration du sujet et des durées…',
   replayError: 'Impossible de reprendre cette session. Réessaie ou choisis un autre sujet.',

@@ -1,5 +1,6 @@
 ---
 import T from './T.astro';
+import Icon from './Icon.astro';
 import { ui } from '../i18n/ui';
 import {
   DEFAULTS,
@@ -14,7 +15,7 @@ import {
 <noscript><p><T k="noScript" /></p></noscript>
 <div class="panel">
   <div class="sound-controls">
-    <button type="button" id="sound-toggle" aria-pressed="false"><T k="soundOff" /></button>
+    <button type="button" id="sound-toggle" aria-pressed="false"><Icon name="speaker" /><span id="sound-label"><T k="soundOff" /></span></button>
     <p id="sound-status" role="status" hidden><T k="soundError" /></p>
   </div>
   <section class="settings" aria-labelledby="settings-heading">
@@ -80,9 +81,10 @@ import {
 
     <div class="actions">
       <button type="button" id="retry" class="text-action primary" hidden><T k="retry" /></button>
-      <button type="button" id="spin" class="text-action primary" aria-disabled="true"><T k="spin" /></button>
-      <button type="button" id="session" class="text-action primary" aria-disabled="true" hidden></button>
+      <button type="button" id="spin" class="text-action primary" aria-keyshortcuts="Space" aria-disabled="true"><T k="spin" /></button>
+      <button type="button" id="session" class="text-action primary" aria-keyshortcuts="Enter" aria-disabled="true" hidden></button>
     </div>
+    <p class="shortcut-hints meta" id="shortcut-hints"><T k="shortcutHints" /></p>
     <div id="session-controls" hidden>
       <p id="timer" role="timer" aria-live="off">10:00</p>
       <div id="timer-progress" class="timer-progress" aria-hidden="true"><span id="progress-fill"></span></div>
@@ -150,7 +152,7 @@ import {
       $('sound-status').hidden = enabled;
       if (enabled) sound.play('preparation'); // A brief preview confirms sound is on.
     }
-    soundButton.innerHTML = t(sound.enabled ? 'soundOn' : 'soundOff');
+    $('sound-label').innerHTML = t(sound.enabled ? 'soundOn' : 'soundOff');
     soundButton.setAttribute('aria-pressed', String(sound.enabled));
   });
   const pausedEl = $('paused');
@@ -496,10 +498,13 @@ import {
     const panel = document.querySelector<HTMLElement>('.panel')!;
     const actions = panel.querySelector<HTMLElement>('.stage > .actions')!;
     const account = panel.querySelector<HTMLElement>('.account-tools')!;
+    const hints = $('shortcut-hints');
+    const hintsHeight = getComputedStyle(hints).display === 'none' ? 0
+      : hints.getBoundingClientRect().height + parseFloat(getComputedStyle(hints).marginTop);
     const footer = document.querySelector<HTMLElement>('footer')!;
     const below = actions.getBoundingClientRect().height + parseFloat(getComputedStyle(actions).marginTop)
       + account.getBoundingClientRect().height + parseFloat(getComputedStyle(account).marginTop)
-      + parseFloat(getComputedStyle(panel).paddingBottom) + footer.getBoundingClientRect().height;
+      + hintsHeight + parseFloat(getComputedStyle(panel).paddingBottom) + footer.getBoundingClientRect().height;
     const available = Math.max(0, window.innerHeight - (stageBody.getBoundingClientRect().top + window.scrollY) - below - 2);
     const measure = stageBody.cloneNode(true) as HTMLElement;
     measure.removeAttribute('id');measure.removeAttribute('role');measure.removeAttribute('aria-live');
@@ -592,6 +597,15 @@ import {
   }
 
   spinButton.addEventListener('click', spin);
+  document.addEventListener('keydown', (event) => {
+    if (event.defaultPrevented || event.repeat || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || phase !== 'home') return;
+    const target = event.target;
+    if (target instanceof HTMLElement && target.closest('button, a, input, select, textarea, [contenteditable]:not([contenteditable="false"]), [role="button"], [role="dialog"]')) return;
+    const action = event.code === 'Space' ? spinButton : event.key === 'Enter' ? sessionButton : null;
+    if (!action || action.hidden || action.getAttribute('aria-disabled') === 'true') return;
+    event.preventDefault();
+    action.click();
+  });
   window.addEventListener('resize', () => {
     if (phase === 'home' && !state.spinning) {
       stageBody.style.minHeight = '';
@@ -629,6 +643,7 @@ import {
   }
 
   function render() {
+    $('shortcut-hints').hidden = phase !== 'home';
     const active = phase !== 'home';
     $('replay-retry').hidden=!replayFailed || restoringHistory;
     document.querySelectorAll<HTMLSelectElement>('select[data-setting]').forEach(select=>select.disabled=restoringHistory);
@@ -697,6 +712,11 @@ import {
 </script>
 
 <style>
+  #sound-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+  #sound-toggle[aria-pressed='false'] :global(.sound-waves),
+  #sound-toggle[aria-pressed='true'] :global(.sound-slash) { display: none; }
+  .stage .shortcut-hints { margin: 18px 0 0; font-size: .65rem; }
+  @media (hover: none) and (pointer: coarse) { .shortcut-hints { display: none; } }
   .account-tools {min-height:48px;margin:12px auto 0;max-width:640px;font-size:.85rem;color:var(--muted);}
   .account-tools p:empty {display:none;}
   .account-tools button,.account-tools a {min-height:44px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:.3em;}

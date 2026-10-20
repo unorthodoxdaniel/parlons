@@ -29,6 +29,10 @@ const {
          Runs before first paint so the page never flashes the wrong language. -->
     <script is:inline>
       (function () {
+        var theme;
+        try { theme = localStorage.getItem('parlons:theme'); } catch (e) {}
+        document.documentElement.dataset.theme = theme === 'dark' || theme === 'light'
+          ? theme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         var lang;
         try { lang = localStorage.getItem('parlons:ui-lang'); } catch (e) {}
         if (lang !== 'fr' && lang !== 'en') {
