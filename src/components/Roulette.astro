@@ -555,18 +555,22 @@ import {
     render();
     reservePromptSpace(pool, true);
 
-    // A short shuffle through eligible prompts, slowing to a stop. Skipped
-    // entirely under prefers-reduced-motion.
+    // Cycle like a reel: rapid early frames, then a long, gradual slowdown.
+    // Absolute deadlines keep rendering work from extending the 4.7-second spin.
     if (!reducedMotion.matches && pool.length > 1) {
-      let last: Prompt | null = null;
-      for (const delay of [70, 70, 80, 95, 115, 145, 190]) {
-        const frame = pickPrompt(pool, last)!;
-        last = frame;
+      const weights = Array.from({ length: 70 }, (_, i) => 18 + 500 * (i / 69) ** 8);
+      const total = weights.reduce((sum, weight) => sum + weight, 0);
+      const start = performance.now();
+      const offset = Math.floor(Math.random() * pool.length);
+      let elapsed = 0;
+      for (const [index, weight] of weights.entries()) {
         if (reducedMotion.matches || revision!==settingsRevision) break;
-        sound.play('tick');
+        const frame = pool[(offset + index) % pool.length];
+        sound.play('tick', index / (weights.length - 1));
         showPrompt(frame);
         textEl.hidden = false;
-        await wait(delay);
+        elapsed += 4700 * weight / total;
+        await wait(Math.max(0, start + elapsed - performance.now()));
       }
     }
 
@@ -580,7 +584,10 @@ import {
     render();
     if (state.prompt) {
       reservePromptSpace([state.prompt]);
-      if (!reducedMotion.matches) textEl.animate([{ opacity: .45 }, { opacity: 1 }], { duration: 180 });
+      if (!reducedMotion.matches) textEl.animate([
+        { opacity: .65, transform: 'translateY(8px) scale(.98)' },
+        { opacity: 1, transform: 'translateY(0) scale(1)' },
+      ], { duration: 550, easing: 'cubic-bezier(.22, 1, .36, 1)' });
     }
     drawInitialPrompt();
   }

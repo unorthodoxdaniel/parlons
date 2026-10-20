@@ -1,7 +1,8 @@
 /** Quiet synthesized cues; no audio downloads or third-party dependencies. */
 export class SessionSound {
   private context: AudioContext | null = null;
-  private voices = new Set<OscillatorNode>();
+  private voices = new Set<AudioScheduledSourceNode>();
+  private clickBuffer: AudioBuffer | null = null;
   enabled = false;
 
   async enable(): Promise<boolean> {
@@ -21,15 +22,56 @@ export class SessionSound {
     this.voices.clear();
   }
 
-  play(cue: 'preparation' | 'finished' | 'tick' | 'reveal') {
+  play(cue: 'preparation' | 'finished' | 'tick' | 'reveal', progress = 0) {
     const context = this.context;
     if (!this.enabled || !context || context.state !== 'running') return;
     try {
-      const notes = cue === 'finished' ? [660, 880] : cue === 'tick' ? [420] : cue === 'reveal' ? [880] : [660];
-      const duration = cue === 'tick' ? .035 : cue === 'reveal' ? .22 : .35;
-      const volume = cue === 'tick' ? .025 : .09;
+      if (cue === 'tick') {
+        // A brief noise transient and a falling wooden tap stay distinct even
+        // at the reel's fastest cadence, unlike overlapping sine-wave beeps.
+        this.clickBuffer ??= context.createBuffer(1, Math.ceil(context.sampleRate * .012), context.sampleRate);
+        const data = this.clickBuffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        const start = context.currentTime;
+        const weight = Math.min(1, Math.max(0, progress));
+        const noise = context.createBufferSource();
+        noise.buffer = this.clickBuffer;
+        const filter = context.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 2400 - 800 * weight;
+        filter.Q.value = .8;
+        const voice = context.createOscillator();
+        voice.type = 'triangle';
+        const pitch = (900 - 280 * weight) * (.96 + Math.random() * .08);
+        voice.frequency.setValueAtTime(pitch, start);
+        voice.frequency.exponentialRampToValueAtTime(pitch * .45, start + .012);
+        const gain = context.createGain();
+        gain.gain.setValueAtTime(.0001, start);
+        gain.gain.linearRampToValueAtTime(.035 + .025 * weight, start + .001);
+        gain.gain.exponentialRampToValueAtTime(.0001, start + .012);
+        noise.connect(filter);
+        filter.connect(gain);
+        voice.connect(gain);
+        gain.connect(context.destination);
+        for (const source of [noise, voice]) {
+          this.voices.add(source);
+          source.onended = () => {
+            this.voices.delete(source);
+            source.disconnect();
+            if (!this.voices.has(noise) && !this.voices.has(voice)) {
+              filter.disconnect(); gain.disconnect();
+            }
+          };
+          source.start(start);
+          source.stop(start + .014);
+        }
+        return;
+      }
+      const notes = cue === 'finished' ? [660, 880] : cue === 'reveal' ? [520, 780] : [660];
+      const duration = cue === 'reveal' ? .16 : .35;
+      const volume = cue === 'reveal' ? .045 : .09;
       notes.forEach((frequency, index) => {
-        const start = context.currentTime + index * .23;
+        const start = context.currentTime + index * (cue === 'reveal' ? .065 : .23);
         const voice = context.createOscillator();
         const gain = context.createGain();
         voice.type = 'sine';
