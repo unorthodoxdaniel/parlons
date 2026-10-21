@@ -1,0 +1,353 @@
+draft_id,theme_key,language_code,text
+EL01,everyday-life,en,Which cheap object would you be most annoyed to lose? Explain why replacing it would not be quite the same.
+EL01,everyday-life,fr,Quel objet peu coûteux seriez-vous le plus contrarié de perdre ? Pourquoi son remplacement ne serait-il pas tout à fait pareil ?
+EL02,everyday-life,en,"You can make one everyday item twice as big or half its size. What do you change, and who benefits?"
+EL02,everyday-life,fr,"Vous pouvez doubler la taille d'un objet du quotidien ou la réduire de moitié. Que changez-vous, et à qui cela profite-t-il ?"
+EL03,everyday-life,en,Give a passionate defence of a food combination other people find strange.
+EL03,everyday-life,fr,Défendez avec passion une association d'aliments que les autres trouvent étrange.
+EL04,everyday-life,en,"Two people share a kitchen: one cleans while cooking, the other cleans afterward. Negotiate an arrangement they can both live with."
+EL04,everyday-life,fr,"Deux personnes partagent une cuisine : l'une nettoie en cuisinant, l'autre après. Négociez un arrangement qui leur convient à toutes les deux."
+EL05,everyday-life,en,Which everyday task looks easy until you have to explain every step to a beginner?
+EL05,everyday-life,fr,Quelle tâche quotidienne semble facile jusqu'au moment où il faut en expliquer chaque étape à un débutant ?
+EL06,everyday-life,en,"Your electricity will be off for an evening, with enough notice to prepare. Plan an evening you might actually enjoy."
+EL06,everyday-life,fr,Une coupure de courant est prévue pour toute une soirée. Vous avez le temps de vous préparer. Imaginez une soirée qui pourrait vous plaire malgré tout.
+EL07,everyday-life,en,A visitor can observe your home but cannot ask questions. What might they wrongly conclude about you?
+EL07,everyday-life,fr,"Une personne peut observer votre logement, mais ne peut pas vous poser de questions. Que pourrait-elle en déduire à tort sur vous ?"
+EL08,everyday-life,en,"A shopping list says: lemons, string, a birthday candle, batteries and a single potato. Who wrote it, and what are they planning?"
+EL08,everyday-life,fr,"Une liste de courses indique : des citrons, de la ficelle, une bougie d'anniversaire, des piles et une seule pomme de terre. Qui l'a écrite, et que prépare cette personne ?"
+EL09,everyday-life,en,Which item do people buy for the person they hope to become? Explain what happens when it gets home.
+EL09,everyday-life,fr,Quel objet achète-t-on pour la personne qu'on espère devenir ? Racontez ce qui se passe une fois l'objet à la maison.
+EL10,everyday-life,en,You are leaving instructions for someone looking after your home. What detail would be obvious to you but surprising to them?
+EL10,everyday-life,fr,Vous laissez des consignes à quelqu'un qui va s'occuper de votre logement. Quel détail évident pour vous pourrait le surprendre ?
+RE01,relationships,en,A friend asks for your opinion but seems to want encouragement. How would you work out what they need?
+RE01,relationships,fr,"Un ami vous demande votre avis, mais semble surtout chercher des encouragements. Comment savoir ce dont il a besoin ?"
+RE02,relationships,en,Two friends remember the same event very differently. Does either of them need to win the argument?
+RE02,relationships,fr,Deux amis ont des souvenirs très différents d'un même événement. Faut-il forcément que l'un des deux ait raison ?
+RE03,relationships,en,You receive a generous invitation to something you would hate. Decline it without making the host regret asking.
+RE03,relationships,fr,On vous invite généreusement à une activité qui ne vous plairait pas du tout. Déclinez sans faire regretter à la personne de vous avoir invité.
+RE04,relationships,en,Someone keeps giving you advice you did not request. What could you say while keeping the relationship warm?
+RE04,relationships,fr,Quelqu'un vous donne sans cesse des conseils que vous n'avez pas demandés. Que pourriez-vous dire sans refroidir la relation ?
+RE05,relationships,en,Can a friendship work when one person loves debating and the other finds disagreement exhausting?
+RE05,relationships,fr,Une amitié peut-elle fonctionner quand l'un adore débattre et que l'autre trouve les désaccords épuisants ?
+RE06,relationships,en,You are introducing two friends who have almost nothing in common. How would you get their conversation started?
+RE06,relationships,fr,Vous présentez deux amis qui n'ont presque rien en commun. Comment lanceriez-vous la conversation entre eux ?
+RE07,relationships,en,What kind of compliment is hardest to forget? Give a real or invented example.
+RE07,relationships,fr,Quel genre de compliment est le plus difficile à oublier ? Donnez un exemple réel ou inventé.
+RE08,relationships,en,"A group chat has gone quiet. Should someone revive it, or can it end naturally?"
+RE08,relationships,fr,Une conversation de groupe ne reçoit plus de messages. Faut-il la relancer ou la laisser s'éteindre naturellement ?
+RE09,relationships,en,You lend something to a friend and it comes back damaged. What matters most in the conversation that follows?
+RE09,relationships,fr,"Vous prêtez un objet à un ami, qui vous le rend abîmé. Qu'est-ce qui compte le plus dans la conversation qui suit ?"
+RE10,relationships,en,Is it better to ask someone how they want to be supported or to take the initiative? Describe when each approach helps.
+RE10,relationships,fr,Vaut-il mieux demander à quelqu'un comment le soutenir ou prendre les devants ? Dans quelles situations chaque approche est-elle utile ?
+CU01,culture,en,A film you disliked keeps coming up in conversation. Explain what it did well before explaining why it did not work for you.
+CU01,culture,fr,"Un film que vous n'avez pas aimé revient souvent dans les conversations. Expliquez d'abord ses qualités, puis pourquoi il ne vous a pas plu."
+CU02,culture,en,"You can hear one song again as though you have never heard it before. Which would you choose, and where would you listen?"
+CU02,culture,fr,"Vous pouvez réécouter une chanson comme si vous ne l'aviez jamais entendue. Laquelle choisissez-vous, et où l'écoutez-vous ?"
+CU03,culture,en,Does knowing how much effort went into something change how much you enjoy it?
+CU03,culture,fr,Savoir combien d'efforts une création a demandés change-t-il le plaisir que vous en tirez ?
+CU05,culture,en,A restaurant removes your favourite dish because almost nobody orders it. Make the case for keeping it—or explain why you would accept the decision.
+CU05,culture,fr,Un restaurant retire votre plat préféré parce que presque personne ne le commande. Défendez son maintien ou expliquez pourquoi vous accepteriez cette décision.
+CU06,culture,en,What makes something feel dated in a charming way rather than an embarrassing way?
+CU06,culture,fr,Qu'est-ce qui donne à une œuvre un charme désuet plutôt qu'un côté embarrassant ?
+CU08,culture,en,Would you rather know the ending of a story in advance or know nothing at all? Explain what you gain and lose.
+CU08,culture,fr,Préférez-vous connaître la fin d'une histoire à l'avance ou ne rien savoir du tout ? Qu'y gagnez-vous et qu'y perdez-vous ?
+CU09,culture,en,A local cinema can show only one film this month. How should it choose something for a community with different tastes?
+CU09,culture,fr,Un cinéma de quartier ne peut projeter qu'un seul film ce mois-ci. Comment choisir pour un public aux goûts variés ?
+CU10,culture,en,Choose a minor character from a story you know. What would their ordinary day look like after the story ends?
+CU10,culture,fr,Choisissez un personnage secondaire d'une histoire que vous connaissez. À quoi ressemblerait une journée ordinaire de sa vie après la fin de l'histoire ?
+SO01,society,en,A busy park has space for either a quiet garden or a sports court. Present the strongest case for each before choosing.
+SO01,society,fr,"Dans un parc très fréquenté, il reste de la place soit pour un jardin paisible, soit pour un terrain de sport. Défendez chaque option avant de choisir."
+SO02,society,en,Should a popular free event require reservations if many people reserve and never arrive?
+SO02,society,fr,Un événement gratuit très populaire devrait-il imposer des réservations si beaucoup de personnes réservent sans venir ?
+SO03,society,en,"A town wants to rename a street. Who should have a say, and what would make the process feel fair?"
+SO03,society,fr,"Une ville veut changer le nom d'une rue. Qui devrait participer à la décision, et comment rendre la démarche équitable ?"
+SO04,society,en,What should people be allowed to do in a public square without buying anything?
+SO04,society,fr,Que devrait-on pouvoir faire sur une place publique sans rien acheter ?
+SO05,society,en,Your neighbourhood noticeboard is full of complaints. What good thing would you announce to change the mood?
+SO05,society,fr,Le panneau d'affichage de votre quartier est rempli de plaintes. Quelle bonne nouvelle y annonceriez-vous pour changer l'ambiance ?
+SO06,society,en,Should a shop let people use its toilet without making a purchase? Consider the situation from both sides.
+SO06,society,fr,Un commerce devrait-il laisser les gens utiliser ses toilettes sans rien acheter ? Examinez la question des deux points de vue.
+SO07,society,en,A community garden produces more vegetables than its volunteers can use. Decide how the surplus should be shared.
+SO07,society,fr,Un jardin partagé produit plus de légumes que ses bénévoles ne peuvent en consommer. Décidez comment répartir le surplus.
+SO08,society,en,"What would you put in a welcome pack for someone who has just moved to your town, beyond maps and advertisements?"
+SO08,society,fr,"Que mettriez-vous dans un kit d'accueil pour une personne qui vient de s'installer dans votre ville, au-delà des plans et des publicités ?"
+SO09,society,en,Is a small courtesy still valuable when everyone is expected to perform it?
+SO09,society,fr,Une petite marque de politesse a-t-elle encore de la valeur lorsqu'on l'attend de tout le monde ?
+ME01,memories,en,Tell the story of an ordinary day that became memorable for a very small reason. You may invent it.
+ME01,memories,fr,Racontez une journée ordinaire devenue mémorable pour une toute petite raison. Vous pouvez l'inventer.
+ME02,memories,en,What did you misunderstand as a child that made perfect sense to you at the time?
+ME02,memories,fr,Quelle idée fausse aviez-vous enfant qui vous semblait parfaitement logique à l'époque ?
+ME03,memories,en,Describe a place you remember mainly through the route you took to get there.
+ME03,memories,fr,Décrivez un lieu dont vous vous souvenez surtout grâce au trajet pour y aller.
+ME04,memories,en,"Think of an old photograph, real or imagined. What happened just outside the frame?"
+ME04,memories,fr,"Pensez à une vieille photo, réelle ou imaginaire. Que se passait-il juste en dehors du cadre ?"
+ME05,memories,en,Tell a story about waiting for something. Was the anticipation better or worse than the event?
+ME05,memories,fr,Racontez une attente. L'anticipation était-elle meilleure ou pire que l'événement lui-même ?
+ME06,memories,en,Describe something you used to find difficult that you now do without thinking.
+ME06,memories,fr,Décrivez quelque chose qui vous semblait difficile autrefois et que vous faites maintenant sans y penser.
+ME07,memories,en,Which small detail would help you recreate a room from your past?
+ME07,memories,fr,Quel petit détail vous aiderait à recréer une pièce de votre passé ?
+ME08,memories,en,"Tell the story of an accidental discovery: a place, a recipe, a song or something else."
+ME08,memories,fr,"Racontez une découverte faite par hasard : un lieu, une recette, une chanson ou autre chose."
+ME09,memories,en,"Imagine finding a notebook you kept ten years ago. What would you hope to find in it, and what might puzzle you?"
+ME09,memories,fr,"Vous retrouvez un carnet que vous teniez il y a dix ans. Qu'espérez-vous y lire, et qu'est-ce qui pourrait vous laisser perplexe ?"
+ME10,memories,en,Describe a moment when you realised you had become familiar with a place that once felt unfamiliar.
+ME10,memories,fr,Décrivez le moment où vous avez réalisé qu'un lieu autrefois inconnu vous était devenu familier.
+LE01,learning,en,Teach someone a simple game without showing them the rules. How would you check they understood?
+LE01,learning,fr,Apprenez un jeu simple à quelqu'un sans lui montrer les règles écrites. Comment vérifieriez-vous qu'il a compris ?
+LE02,learning,en,Is it easier to learn from someone who is naturally talented or someone who struggled? Explain your choice.
+LE02,learning,fr,Est-il plus facile d'apprendre auprès d'une personne naturellement douée ou de quelqu'un qui a eu du mal ? Expliquez votre choix.
+LE03,learning,en,You have learnt a new word but keep forgetting to use it. Invent a situation that would make it stick.
+LE03,learning,fr,"Vous avez appris un nouveau mot, mais vous oubliez toujours de l'utiliser. Imaginez une situation qui vous aiderait à le retenir."
+LE04,learning,en,Describe something you can recognise when it is done well but cannot do well yourself.
+LE04,learning,fr,Décrivez une activité dont vous reconnaissez la qualité sans savoir bien la pratiquer vous-même.
+LE05,learning,en,A beginner asks a question that everyone else is afraid to ask. How should the teacher respond?
+LE05,learning,fr,Un débutant pose une question que personne d'autre n'ose poser. Comment l'enseignant devrait-il réagir ?
+LE06,learning,en,You must choose between clear feedback that is uncomfortable and encouraging feedback that is vague. What would you ask for?
+LE06,learning,fr,Vous devez choisir entre un retour précis mais difficile à entendre et un retour encourageant mais vague. Que demanderiez-vous ?
+LE07,learning,en,"When does copying an example help you learn, and when does it stop you thinking?"
+LE07,learning,fr,Quand reproduire un exemple aide-t-il à apprendre ? Quand cela empêche-t-il de réfléchir ?
+LE08,learning,en,"Explain a concept using an analogy, then point out where your analogy breaks down."
+LE08,learning,fr,"Expliquez une notion à l'aide d'une analogie, puis montrez les limites de cette comparaison."
+LE09,learning,en,"You discover that a method you were taught is unnecessarily complicated. Would you keep it, adapt it or start again?"
+LE09,learning,fr,"Vous découvrez qu'une méthode qu'on vous a enseignée est inutilement compliquée. La gardez-vous, l'adaptez-vous ou repartez-vous de zéro ?"
+LE10,learning,en,How would you tell whether you are improving at something that has no scores or exams?
+LE10,learning,fr,Comment sauriez-vous si vous progressez dans une activité sans notes ni examens ?
+IM01,imagination,en,"A lost-property office has your missing patience, courage and curiosity. Which do you collect first, and where might you have left it?"
+IM01,imagination,fr,"Au bureau des objets trouvés, on a retrouvé votre patience, votre courage et votre curiosité. Que récupérez-vous d'abord, et où avez-vous bien pu les laisser ?"
+IM02,imagination,en,Every building must have one room with no practical purpose. Design yours.
+IM02,imagination,fr,Chaque bâtiment doit comporter une pièce sans aucune utilité pratique. Imaginez la vôtre.
+IM03,imagination,en,"For one day, everyone can hear the background music that matches your mood. How would you spend the day?"
+IM03,imagination,fr,"Pendant une journée, tout le monde entend la musique de fond qui correspond à votre humeur. Comment passez-vous la journée ?"
+IM04,imagination,en,You inherit a shop that sells only things nobody needs anymore. What is its most surprising bestseller?
+IM04,imagination,fr,Vous héritez d'une boutique qui ne vend que des choses dont plus personne n'a besoin. Quel est son succès de vente le plus surprenant ?
+IM05,imagination,en,A door in your home opens to a different place each Sunday. What rules would you make before stepping through?
+IM05,imagination,fr,Une porte de votre logement s'ouvre chaque dimanche sur un lieu différent. Quelles règles fixeriez-vous avant de la franchir ?
+IM06,imagination,en,"People can exchange talents for a week, but neither person can use their own talent during the swap. Propose an exchange."
+IM06,imagination,fr,"On peut échanger ses talents pendant une semaine, mais personne ne peut utiliser son propre talent durant l'échange. Proposez un échange."
+IM07,imagination,en,"The moon is available for one short advertisement. What message would you put there, if any?"
+IM07,imagination,fr,"On vous propose d'afficher une courte publicité sur la Lune. Quel message y mettez-vous, si vous décidez d'en mettre un ?"
+IM09,imagination,en,You receive a postcard from a city that does not exist. Describe the message and what you do next.
+IM09,imagination,fr,Vous recevez une carte postale d'une ville qui n'existe pas. Décrivez le message et ce que vous faites ensuite.
+IM10,imagination,en,Invent a competition in which finishing first is a disadvantage. Explain how someone wins.
+IM10,imagination,fr,Inventez une compétition où terminer premier est un désavantage. Expliquez comment on gagne.
+WO01,work,en,"A meeting ends with everyone agreeing, but nobody knows what to do next. How would you rescue it?"
+WO01,work,fr,"Une réunion se termine : tout le monde est d'accord, mais personne ne sait quoi faire ensuite. Comment débloqueriez-vous la situation ?"
+WO02,work,en,You have a useful idea that would create extra work for someone else. How would you propose it fairly?
+WO02,work,fr,Vous avez une idée utile qui donnerait du travail supplémentaire à quelqu'un d'autre. Comment la proposeriez-vous de façon équitable ?
+WO03,work,en,"A new colleague asks why a task is done a certain way, and nobody knows. What should happen next?"
+WO03,work,fr,"Une nouvelle recrue demande pourquoi une tâche se fait d'une certaine manière, et personne ne sait répondre. Que devrait-il se passer ensuite ?"
+WO06,work,en,"You finish a task much earlier than expected. What would you do with the remaining time, and what might influence your decision?"
+WO06,work,fr,"Vous terminez une tâche beaucoup plus tôt que prévu. Que faites-vous du temps restant, et qu'est-ce qui pourrait influencer votre décision ?"
+WO07,work,en,A team has too many priorities. How would you help it decide what it will stop doing?
+WO07,work,fr,Une équipe a trop de priorités. Comment l'aideriez-vous à décider ce qu'elle va arrêter de faire ?
+WO08,work,en,Describe a workplace rule that sounds sensible but could have an unexpected downside.
+WO08,work,fr,"Décrivez une règle professionnelle qui semble raisonnable, mais pourrait avoir un inconvénient inattendu."
+WO09,work,en,You must explain a delay without blaming anyone or pretending everything is fine. What would you say?
+WO09,work,fr,Vous devez expliquer un retard sans accuser personne ni faire comme si tout allait bien. Que diriez-vous ?
+TR01,travel,en,You have promised to bring home a souvenir but have very little luggage space. What would you look for?
+TR01,travel,fr,"Vous avez promis de rapporter un souvenir, mais il reste très peu de place dans vos bagages. Que chercheriez-vous ?"
+TR03,travel,en,You and a travel companion want completely different kinds of holiday. Plan one day that gives each of you something to enjoy.
+TR03,travel,fr,Votre compagnon de voyage et vous avez des envies de vacances très différentes. Organisez une journée où chacun trouve son compte.
+TR04,travel,en,You arrive somewhere and discover you have misunderstood a local custom. How would you recover gracefully?
+TR04,travel,fr,Vous arrivez quelque part et découvrez que vous avez mal compris une coutume locale. Comment réagiriez-vous avec tact ?
+TR05,travel,en,Would you rather stay in one place for a month or visit four places in the same time? Explain what you would miss either way.
+TR05,travel,fr,Préféreriez-vous rester un mois au même endroit ou découvrir quatre lieux pendant cette période ? Que manqueriez-vous dans chaque cas ?
+TR06,travel,en,Describe the first thing you notice when returning home after time away.
+TR06,travel,fr,Décrivez la première chose que vous remarquez en rentrant chez vous après une absence.
+TR07,travel,en,A guidebook describes a place you know well. What might it miss even if every fact is correct?
+TR07,travel,fr,"Un guide touristique décrit un lieu que vous connaissez bien. Que pourrait-il manquer, même si toutes les informations sont exactes ?"
+TR08,travel,en,You must choose a destination based on one question you can ask someone who lives there. What would you ask?
+TR08,travel,fr,Vous devez choisir une destination en posant une seule question à quelqu'un qui y vit. Que demanderiez-vous ?
+TR09,travel,en,Tell the story of a journey from the point of view of a suitcase.
+TR09,travel,fr,Racontez un voyage du point de vue d'une valise.
+TE01,technology,en,A messaging app adds a button that explains why someone has not replied. Would you use it? What could go wrong?
+TE01,technology,fr,Une messagerie ajoute un bouton qui explique pourquoi quelqu'un n'a pas répondu. L'utiliseriez-vous ? Qu'est-ce qui pourrait mal se passer ?
+TE03,technology,en,An app keeps changing where its buttons are. Explain when a redesign is worth making users learn again.
+TE03,technology,fr,Une application déplace sans cesse ses boutons. Quand une nouvelle interface vaut-elle la peine d'imposer un nouvel apprentissage aux utilisateurs ?
+TE04,technology,en,Your photo library has thousands of pictures. How would you choose ten that are worth keeping?
+TE04,technology,fr,Votre photothèque contient des milliers de photos. Comment en choisiriez-vous dix qui méritent d'être conservées ?
+TE05,technology,en,Would you rather own a simpler device outright or rent a better one that depends on a subscription?
+TE05,technology,fr,Préféreriez-vous posséder un appareil simple ou louer un appareil plus performant qui dépend d'un abonnement ?
+TE06,technology,en,A navigation app finds a shortcut through a quiet residential street. Whose interests should it consider?
+TE06,technology,fr,Une application de navigation propose un raccourci par une rue résidentielle calme. De qui devrait-elle prendre les intérêts en compte ?
+TE07,technology,en,You can add a confirmation step to one online action and remove it from another. Which actions do you choose?
+TE07,technology,fr,Vous pouvez ajouter une étape de confirmation à une action en ligne et la supprimer pour une autre. Quelles actions choisissez-vous ?
+TE08,technology,en,A device works perfectly but no longer receives updates. What would you want to know before deciding whether to keep it?
+TE08,technology,fr,"Un appareil fonctionne parfaitement, mais ne reçoit plus de mises à jour. Que voudriez-vous savoir avant de décider de le garder ?"
+TE09,technology,en,Explain how you would help someone recover from sending a message to the wrong group chat.
+TE09,technology,fr,Comment aideriez-vous quelqu'un qui a envoyé un message à la mauvaise conversation de groupe ?
+TE10,technology,en,Imagine a search engine that gives you one good question before giving you an answer. When would that be useful or irritating?
+TE10,technology,fr,Imaginez un moteur de recherche qui vous pose une bonne question avant de vous donner une réponse. Quand serait-ce utile ou agaçant ?
+EL12,everyday-life,en,A parcel arrives with your address and somebody else's name. Tell the story of what happens next.
+EL12,everyday-life,fr,"Un colis arrive avec votre adresse, mais le nom de quelqu'un d'autre. Racontez la suite."
+EL13,everyday-life,en,"Which sound belongs in a home, and which sound would you happily never hear again?"
+EL13,everyday-life,fr,"Quel son a sa place dans un foyer, et lequel seriez-vous heureux de ne plus jamais entendre ?"
+EL14,everyday-life,en,You have to explain your favourite snack to someone who cannot see it. Make them want to try it.
+EL14,everyday-life,fr,Décrivez votre en-cas préféré à quelqu'un qui ne peut pas le voir. Donnez-lui envie d'y goûter.
+EL15,everyday-life,en,"A shop lets you try any object at home for a week before buying it. What would you test, and what would count as a success?"
+EL15,everyday-life,fr,"Une boutique vous laisse essayer n'importe quel objet chez vous pendant une semaine avant de l'acheter. Que testeriez-vous, et qu'est-ce qui vous convaincrait ?"
+EL16,everyday-life,en,You must prepare dinner using the ingredient you usually avoid. How would you make it appealing?
+EL16,everyday-life,fr,Vous devez préparer le dîner avec l'ingrédient que vous évitez habituellement. Comment le rendriez-vous appétissant ?
+EL17,everyday-life,en,"What is worth doing the long way, even when a shortcut exists?"
+EL17,everyday-life,fr,"Qu'est-ce qui mérite qu'on y consacre du temps, même lorsqu'un raccourci existe ?"
+EL18,everyday-life,en,Your local café asks you to name a new sandwich. Invent the sandwich and explain the name.
+EL18,everyday-life,fr,Le café du quartier vous demande de nommer un nouveau sandwich. Inventez le sandwich et expliquez son nom.
+EL20,everyday-life,en,You can keep either all your cups or all your plates. Explain how you would manage without the other.
+EL20,everyday-life,fr,"Vous pouvez garder toutes vos tasses ou toutes vos assiettes, mais pas les deux. Comment feriez-vous sans les autres ?"
+RE11,relationships,en,"Someone remembers your name every time, but you have forgotten theirs again. How would you handle your next meeting?"
+RE11,relationships,fr,"Quelqu'un se souvient toujours de votre prénom, mais vous avez encore oublié le sien. Comment réagiriez-vous à votre prochaine rencontre ?"
+RE12,relationships,en,Two friends always say “anything is fine” when choosing where to eat. Invent a way for them to make a decision.
+RE12,relationships,fr,Deux amis répondent toujours « comme tu veux » quand il faut choisir où manger. Inventez une façon de les aider à se décider.
+RE13,relationships,en,A friend shares good news about something you would never want for yourself. How would you celebrate with them?
+RE13,relationships,fr,Un ami vous annonce une bonne nouvelle concernant quelque chose dont vous ne voudriez jamais pour vous-même. Comment partageriez-vous sa joie ?
+RE14,relationships,en,You accidentally spoil a surprise. Explain how you would try to save the occasion.
+RE14,relationships,fr,Vous gâchez une surprise par accident. Comment tenteriez-vous de sauver l'occasion ?
+RE15,relationships,en,Is keeping a small promise more meaningful than making a grand gesture? Give a situation that tests your answer.
+RE15,relationships,fr,Tenir une petite promesse a-t-il plus de valeur qu'un grand geste ? Donnez une situation qui met votre réponse à l'épreuve.
+RE16,relationships,en,A friend wants to turn your shared hobby into a business. What would you discuss before agreeing?
+RE16,relationships,fr,Un ami veut transformer votre loisir commun en activité professionnelle. De quoi discuteriez-vous avant d'accepter ?
+RE17,relationships,en,You meet someone whose interests are completely unfamiliar to you. What could you ask beyond “Why do you like that?”
+RE17,relationships,fr,"Vous rencontrez quelqu'un dont les centres d'intérêt vous sont totalement inconnus. Que pourriez-vous demander, au-delà de « Pourquoi aimez-vous ça ? »"
+RE18,relationships,en,Someone you have not spoken to in years sends “I saw this and thought of you.” Invent what they sent and the conversation that follows.
+RE18,relationships,fr,Quelqu'un à qui vous n'avez pas parlé depuis des années vous envoie : « J'ai vu ça et j'ai pensé à toi. » Imaginez ce qui accompagne le message et la conversation qui suit.
+RE19,relationships,en,You and a friend enjoy an activity at very different skill levels. How could you make doing it together enjoyable for both?
+RE19,relationships,fr,"Un ami et vous aimez la même activité, mais vos niveaux sont très différents. Comment faire pour que la pratiquer ensemble plaise aux deux ?"
+RE20,relationships,en,When does a running joke stop being funny? Describe how someone could retire it without creating an argument.
+RE20,relationships,fr,Quand une plaisanterie récurrente cesse-t-elle d'être drôle ? Comment y mettre fin sans déclencher une dispute ?
+CU11,culture,en,Which fictional villain would give surprisingly useful advice about an ordinary problem?
+CU11,culture,fr,Quel méchant de fiction pourrait donner des conseils étonnamment utiles sur un problème ordinaire ?
+CU12,culture,en,You are designing the cover of a book that has no title yet. Describe an image that would make someone pick it up.
+CU12,culture,fr,Vous concevez la couverture d'un livre qui n'a pas encore de titre. Décrivez une image qui donnerait envie de le prendre en main.
+CU13,culture,en,Does a terrible ending ruin a good story? Explain what an ending owes its audience.
+CU13,culture,fr,Une très mauvaise fin gâche-t-elle une bonne histoire ? Qu'est-ce qu'une fin doit offrir à son public ?
+CU14,culture,en,Choose an ordinary sound and explain how it could become the opening of a piece of music.
+CU14,culture,fr,Choisissez un bruit ordinaire et expliquez comment il pourrait devenir le début d'un morceau de musique.
+CU15,culture,en,"A television series you love gets one more episode, set twenty years later. What should happen in it?"
+CU15,culture,fr,"Une série que vous adorez revient pour un dernier épisode, vingt ans plus tard. Que devrait-il s'y passer ?"
+CU16,culture,en,Would you rather see an excellent performance of something familiar or an uneven performance of something completely new?
+CU16,culture,fr,Préféreriez-vous une excellente interprétation d'une œuvre familière ou une interprétation inégale d'une œuvre complètement nouvelle ?
+CU17,culture,en,You are hosting a meal where every dish must connect to the same story. Choose a story and explain the menu.
+CU17,culture,fr,Vous organisez un repas dont chaque plat doit être lié à la même histoire. Choisissez une histoire et expliquez le menu.
+CU18,culture,en,A critic calls your favourite work “pleasant but forgettable.” How would you respond without simply saying they are wrong?
+CU18,culture,fr,"Un critique qualifie votre œuvre préférée d'« agréable, mais vite oubliée ». Comment lui répondriez-vous sans simplement dire qu'il a tort ?"
+CU19,culture,en,What makes a costume convincing when it has almost no budget?
+CU19,culture,fr,Qu'est-ce qui rend un costume convaincant avec un budget presque nul ?
+CU20,culture,en,An audience is allowed to interrupt a play once and change one character's decision. When would you use that opportunity?
+CU20,culture,fr,Le public peut interrompre une pièce une seule fois pour changer la décision d'un personnage. À quel moment utiliseriez-vous cette possibilité ?
+SO11,society,en,A town has one empty shop and can offer it rent-free for a year. What kind of project should get the space?
+SO11,society,fr,Une ville dispose d'un commerce vide qu'elle peut prêter gratuitement pendant un an. Quel type de projet devrait en bénéficier ?
+SO13,society,en,A public clock has shown the wrong time for years and become a local landmark. Should it be fixed?
+SO13,society,fr,Une horloge publique donne une heure fausse depuis des années et fait désormais partie du charme local. Faut-il la remettre à l'heure ?
+SO15,society,en,"Design a public bench for people who want different things: conversation, rest, solitude or a quick lunch."
+SO15,society,fr,"Concevez un banc public pour des personnes aux envies différentes : discuter, se reposer, s'isoler ou déjeuner rapidement."
+SO16,society,en,"A town can celebrate one person with a statue, or many people with a shared memorial. Which would you choose, and why?"
+SO16,society,fr,"Une ville peut rendre hommage à une personne par une statue ou à plusieurs par un monument collectif. Que choisiriez-vous, et pourquoi ?"
+SO17,society,en,"Should a community event be cancelled if only a few people sign up, even when those people are very enthusiastic?"
+SO17,society,fr,"Faut-il annuler un événement de quartier si très peu de personnes s'inscrivent, même si elles sont très enthousiastes ?"
+SO18,society,en,"You can ask everyone in your neighbourhood one question anonymously. What would you ask, and how could the answers help?"
+SO18,society,fr,"Vous pouvez poser une question à tous les habitants de votre quartier, avec des réponses anonymes. Que demanderiez-vous, et à quoi les réponses pourraient-elles servir ?"
+SO19,society,en,A town's unofficial nickname is more popular than its real name. Should the town adopt it?
+SO19,society,fr,Le surnom d'une ville est plus populaire que son vrai nom. La ville devrait-elle l'adopter officiellement ?
+SO20,society,en,"A public service wants to replace written instructions with pictures. What might become easier, and what might become harder?"
+SO20,society,fr,"Un service public veut remplacer ses consignes écrites par des images. Qu'est-ce qui pourrait devenir plus simple, et qu'est-ce qui pourrait devenir plus difficile ?"
+ME11,memories,en,Describe a time you were proud of something that would seem very small to somebody else. A fictional example is welcome.
+ME11,memories,fr,Racontez une fois où vous étiez fier de quelque chose qui semblerait insignifiant à quelqu'un d'autre. Vous pouvez inventer l'exemple.
+ME12,memories,en,Tell a story in which the weather changes everyone's plans for the better.
+ME12,memories,fr,"Racontez une histoire où la météo bouleverse les projets de tout le monde, pour le mieux."
+ME13,memories,en,"What did you once save up for? Describe the waiting as well as the moment of getting it, or invent the story of someone who did."
+ME13,memories,fr,"Pour quoi avez-vous déjà économisé ? Décrivez l'attente et le moment de l'achat, ou inventez l'histoire de quelqu'un qui l'a fait."
+ME14,memories,en,"Describe a game you played as a child, including one rule that adults might find confusing."
+ME14,memories,fr,"Décrivez un jeu de votre enfance, avec une règle que les adultes pourraient trouver déroutante."
+ME15,memories,en,Think of a meal you remember clearly. Explain what made the occasion memorable beyond the food.
+ME15,memories,fr,"Pensez à un repas dont vous vous souvenez bien. Qu'est-ce qui a rendu l'occasion mémorable, au-delà de la nourriture ?"
+ME16,memories,en,Tell a story about recognising someone in an unexpected place. You may invent the encounter.
+ME16,memories,fr,Racontez une rencontre avec une connaissance dans un endroit inattendu. Vous pouvez l'inventer.
+ME17,memories,en,What phrase did you hear often when you were younger? Explain how its meaning might change as someone grows up.
+ME17,memories,fr,Quelle phrase entendiez-vous souvent quand vous étiez plus jeune ? Comment son sens peut-il changer avec l'âge ?
+ME18,memories,en,Describe a celebration through the work that happened before the guests arrived.
+ME18,memories,fr,Décrivez une fête à travers les préparatifs qui ont précédé l'arrivée des invités.
+ME19,memories,en,Tell the story of something that seemed like bad luck at first but later became useful.
+ME19,memories,fr,"Racontez quelque chose qui ressemblait d'abord à de la malchance, mais s'est révélé utile par la suite."
+ME20,memories,en,Imagine interviewing someone about a day you both remember. What would you ask to discover something you missed?
+ME20,memories,fr,Vous interrogez quelqu'un sur une journée dont vous vous souvenez tous les deux. Que demanderiez-vous pour découvrir ce qui vous a échappé ?
+LE11,learning,en,What is something you have never quite understood? Choose one question you would ask someone who knows it well.
+LE11,learning,fr,Y a-t-il quelque chose que vous n'avez jamais tout à fait compris ? Choisissez une question que vous poseriez à quelqu'un qui connaît bien le sujet.
+LE13,learning,en,Would you rather practise with someone slightly better than you or teach someone just starting? Explain what each could reveal.
+LE13,learning,fr,Préféreriez-vous vous entraîner avec quelqu'un d'un peu plus avancé ou enseigner à un débutant ? Que pourrait vous apprendre chaque expérience ?
+LE14,learning,en,Someone gives the right answer for the wrong reason. How would you help them notice without discouraging them?
+LE14,learning,fr,Quelqu'un donne la bonne réponse pour une mauvaise raison. Comment l'aideriez-vous à s'en rendre compte sans le décourager ?
+LE16,learning,en,What makes an explanation satisfying even when it does not answer every question?
+LE16,learning,fr,"Qu'est-ce qui rend une explication satisfaisante, même lorsqu'elle ne répond pas à toutes les questions ?"
+LE17,learning,en,You are allowed to change your mind halfway through a debate. What would make that feel like progress rather than defeat?
+LE17,learning,fr,Vous avez le droit de changer d'avis au milieu d'un débat. Qu'est-ce qui en ferait un progrès plutôt qu'une défaite ?
+LE19,learning,en,A tutorial skips the step you need most. Explain how you would work out what is missing.
+LE19,learning,fr,Un tutoriel saute l'étape dont vous avez le plus besoin. Comment découvririez-vous ce qui manque ?
+LE20,learning,en,Choose a skill you know a little about. What would you tell a beginner to ignore for their first week?
+LE20,learning,fr,Choisissez une compétence que vous connaissez un peu. Que conseilleriez-vous à un débutant de laisser de côté pendant sa première semaine ?
+IM11,imagination,en,"Shadows get one hour off each day. Where does yours go, and how do you know?"
+IM11,imagination,fr,"Les ombres ont une heure de repos par jour. Où va la vôtre, et comment le savez-vous ?"
+IM12,imagination,en,"You find a vending machine that accepts stories instead of money. What would you tell it, and what would you hope to receive?"
+IM12,imagination,fr,"Vous trouvez un distributeur qui accepte des histoires au lieu d'argent. Que lui raconteriez-vous, et qu'espéreriez-vous recevoir ?"
+IM14,imagination,en,"One day, every mirror shows you dressed for a different possible career. What do you see, and which version interests you?"
+IM14,imagination,fr,"Un jour, chaque miroir vous montre dans la tenue d'un autre métier possible. Que voyez-vous, et quelle version vous intéresse ?"
+IM16,imagination,en,A hotel offers rooms with different laws of physics. Describe one room and the warning on its door.
+IM16,imagination,fr,Un hôtel propose des chambres où les lois de la physique sont différentes. Décrivez une chambre et l'avertissement sur sa porte.
+IM17,imagination,en,"Dreams now come with receipts. What would yours list, and which item would you dispute?"
+IM17,imagination,fr,"Les rêves sont désormais accompagnés d'un ticket de caisse. Que trouveriez-vous sur le vôtre, et quelle ligne contesteriez-vous ?"
+IM18,imagination,en,"A travelling circus performs only ordinary tasks, exceptionally well. Describe its star act."
+IM18,imagination,fr,"Un cirque itinérant ne présente que des tâches ordinaires, exécutées exceptionnellement bien. Décrivez son numéro vedette."
+IM19,imagination,en,An island appears once a year for six hours. You can take one person and one object. Plan the visit.
+IM19,imagination,fr,Une île apparaît une fois par an pendant six heures. Vous pouvez emmener une personne et un objet. Organisez la visite.
+IM20,imagination,en,You have been asked to write the instruction manual for luck. Explain its first three rules.
+IM20,imagination,fr,On vous demande de rédiger le mode d'emploi de la chance. Expliquez ses trois premières règles.
+WO11,work,en,A customer asks for something you cannot provide. Explain how you would still make the conversation useful.
+WO11,work,fr,Un client demande quelque chose que vous ne pouvez pas fournir. Comment rendriez-vous la conversation utile malgré tout ?
+WO15,work,en,Would you rather solve a difficult problem alone or an easy problem with a difficult group? Explain your choice.
+WO15,work,fr,Préféreriez-vous résoudre seul un problème difficile ou un problème facile avec un groupe difficile à gérer ? Expliquez votre choix.
+WO16,work,en,"Your job title disappears, but your work stays the same. What title would you give yourself so a stranger understands what you do?"
+WO16,work,fr,"Votre intitulé de poste disparaît, mais votre travail reste le même. Quel titre choisiriez-vous pour qu'un inconnu comprenne ce que vous faites ?"
+WO17,work,en,"A team wants to celebrate finishing a demanding project, but everyone is tired. Suggest a celebration people might actually welcome."
+WO17,work,fr,"Une équipe veut fêter la fin d'un projet exigeant, mais tout le monde est épuisé. Proposez une célébration qui ferait réellement plaisir."
+WO18,work,en,Someone asks for a “quick favour” that will take half a day. How would you respond?
+WO18,work,fr,Quelqu'un vous demande un « petit service rapide » qui prendra une demi-journée. Comment répondriez-vous ?
+WO19,work,en,Have you ever been won over by a good presentation of a weak idea? What makes an idea sound better than it is?
+WO19,work,fr,Une idée peu convaincante vous a-t-elle déjà séduit grâce à une bonne présentation ? Qu'est-ce qui fait paraître une idée meilleure qu'elle ne l'est ?
+WO20,work,en,"A workplace wants every employee to spend one day doing another person's job. Which swaps could be useful, and what would need preparation?"
+WO20,work,fr,"Une entreprise veut que chaque personne passe une journée à faire le travail d'une autre. Quels échanges seraient utiles, et que faudrait-il préparer ?"
+TR11,travel,en,You arrive at a station with two hours before your connection. How would you decide whether to explore or stay nearby?
+TR11,travel,fr,Vous arrivez à une gare avec deux heures avant votre correspondance. Comment décideriez-vous de sortir explorer ou de rester à proximité ?
+TR12,travel,en,A friend asks you to plan a trip but refuses to name a destination. What three questions would you ask first?
+TR12,travel,fr,"Un ami vous demande d'organiser un voyage, mais refuse de choisir une destination. Quelles trois questions lui poseriez-vous d'abord ?"
+TR13,travel,en,"You can return to a place you love, but only in its least popular season. What might you discover?"
+TR13,travel,fr,"Vous pouvez retourner dans un lieu que vous aimez, mais seulement à la saison la moins fréquentée. Que pourriez-vous y découvrir ?"
+TR14,travel,en,Your accommodation has an unexpected house rule. Invent the rule and explain whether you would stay.
+TR14,travel,fr,Votre hébergement impose une règle inattendue. Inventez cette règle et expliquez si vous resteriez.
+TR15,travel,en,Describe a destination through the things someone should bring home in their memory rather than their luggage.
+TR15,travel,fr,Décrivez une destination à travers ce qu'on devrait en rapporter dans ses souvenirs plutôt que dans ses bagages.
+TR16,travel,en,You are showing someone around a place you are still discovering yourself. How would you make that part of the experience?
+TR16,travel,fr,Vous faites visiter un lieu que vous découvrez encore vous-même. Comment en feriez-vous un atout de la visite ?
+TR17,travel,en,A travel companion wants to plan every meal in advance. You want to decide when you are hungry. Negotiate a compromise.
+TR17,travel,fr,Votre compagnon de voyage veut prévoir tous les repas. Vous préférez décider quand la faim arrive. Négociez un compromis.
+TR18,travel,en,You miss your stop and end up somewhere unfamiliar. Tell a story in which that becomes the best part of the day.
+TR18,travel,fr,Vous manquez votre arrêt et vous retrouvez dans un endroit inconnu. Racontez comment cela devient le meilleur moment de la journée.
+TR20,travel,en,"You are writing a review of a place you enjoyed despite its inconveniences. What would you warn visitors about, and why would you still recommend it?"
+TR20,travel,fr,"Vous rédigez un avis sur un lieu qui vous a plu malgré ses inconvénients. De quoi préviendriez-vous les visiteurs, et pourquoi le recommanderiez-vous malgré tout ?"
+TE11,technology,en,"Your phone can show you just one daily statistic. What would you choose to see, and which number would you rather stop checking?"
+TE11,technology,fr,"Votre téléphone ne peut afficher qu'une seule statistique quotidienne. Laquelle choisiriez-vous, et quel chiffre préféreriez-vous arrêter de consulter ?"
+TE12,technology,en,"An app congratulates you every time you complete a small task. When would that be encouraging, and when would it become annoying?"
+TE12,technology,fr,"Une application vous félicite chaque fois que vous terminez une petite tâche. Quand serait-ce encourageant, et quand cela deviendrait-il agaçant ?"
+TE13,technology,en,You must explain the difference between deleting a file and losing track of it to someone who uses only paper documents.
+TE13,technology,fr,Expliquez la différence entre supprimer un fichier et ne plus savoir où il est à quelqu'un qui n'utilise que des documents papier.
+TE14,technology,en,A smart fridge refuses to let you forget food at the back. Describe how it should remind you without becoming unbearable.
+TE14,technology,fr,Un réfrigérateur connecté refuse de vous laisser oublier les aliments du fond. Comment devrait-il vous les rappeler sans devenir insupportable ?
+TE15,technology,en,Would you want a tool that rewrites every message to sound more confident? Explain when you would turn it off.
+TE15,technology,fr,Voudriez-vous un outil qui reformule tous vos messages pour vous donner un ton plus assuré ? Dans quels cas le désactiveriez-vous ?
+TE16,technology,en,A website lets you choose between instant answers and slower answers with clearer explanations. Which would you use for different tasks?
+TE16,technology,fr,"Un site vous laisse choisir entre des réponses immédiates et des réponses plus lentes, mais mieux expliquées. Que choisiriez-vous selon la tâche ?"
+TE17,technology,en,"You can make one device work with every brand of charger, accessory or replacement part. Which device would benefit most?"
+TE17,technology,fr,"Vous pouvez rendre un appareil compatible avec toutes les marques de chargeurs, d'accessoires ou de pièces de rechange. Quel appareil en profiterait le plus ?"
+TE18,technology,en,A family shares one tablet. How should it handle everyone's different preferences without making every use complicated?
+TE18,technology,fr,Une famille partage une seule tablette. Comment tenir compte des préférences de chacun sans compliquer chaque utilisation ?
+TE20,technology,en,"A digital assistant misunderstands a perfectly ordinary request in an amusing way. Invent the request, the result and how you would explain the mistake."
+TE20,technology,fr,"Un assistant numérique comprend une demande banale de travers, avec un résultat amusant. Inventez la demande, le résultat et votre explication du malentendu."
