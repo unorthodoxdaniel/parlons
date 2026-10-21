@@ -1,8 +1,26 @@
 {
-	"name": "parlons",
-	"compatibility_date": "2026-10-02",
-	"assets": {
-		"directory": "./dist"
-	},
-	"previews": {}
+  "name": "parlons",
+  "compatibility_date": "2026-10-02",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "previews": {},
+  "main": "worker/index.ts",
+  "ratelimits": [
+    {
+      "name": "SUGGESTION_RATE_LIMITER",
+      "namespace_id": "20261020",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ],
+  "vars": {
+    "SUGGESTIONS_SHEET_URL": "https://script.google.com/macros/s/AKfycbyw-1HfKRs50xG9exMlbbGZYwi-n9m8jkCDbZi2o5lCp-1PNBxeafizbVyE6m5btQAQ/exec"
+  }
 }

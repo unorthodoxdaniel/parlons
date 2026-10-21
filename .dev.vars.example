@@ -1,0 +1,4 @@
+# Server-only values for local Wrangler development. Copy to ignored .dev.vars.
+TURNSTILE_SECRET_KEY=
+SUGGESTIONS_SHEET_URL=https://script.google.com/macros/s/AKfycbyw-1HfKRs50xG9exMlbbGZYwi-n9m8jkCDbZi2o5lCp-1PNBxeafizbVyE6m5btQAQ/exec
+SUGGESTIONS_SHEET_SECRET=
