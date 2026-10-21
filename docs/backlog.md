@@ -19,8 +19,8 @@
 
 - Add a quiet, optional “Join the Niel Parle newsletter” invitation with an unchecked checkbox, independent from account access. Explain what subscribers will receive and link the relevant privacy information.
 - Connect explicit newsletter opt-ins to Kit after verified sign-in through a server-side integration. Keep the Kit API key out of browser code; record consent wording/version and timestamp, handle delivery failures without blocking sign-in, and respect existing unsubscribes. Decide which Kit form/tag to use and whether to require email confirmation before implementation.
-- Add a discreet “Suggest an idea” feature where users can submit either a feature request or a speaking prompt/topic idea. Include an idea-type choice, the suggestion itself and, for prompts, practice language and an optional theme. Show clear submission confirmation and protect against spam. Decide whether sign-in is required and where submissions are reviewed.
-- Review user-submitted prompts for suitability, originality and duplicates before adding them to the public prompt bank; never publish submissions automatically. Decide how contributors are credited, if at all.
+- Implemented community suggestions on `codex/community-suggestions`: anonymous footer form, feature/prompt choices, tab-local drafts, private Google Sheet review inbox and Cloudflare spam protection. Deploy the Google receiver and configure secrets before live submissions; see [suggestions.md](suggestions.md).
+- Review submissions manually before publication. Contributor credit is not included.
 
 ## Release
 

@@ -50,6 +50,13 @@ record user-reported local verification, not production verification.
       across representative recipient providers. Decide whether a dedicated
       transactional sender is needed as volume grows.
 
+## Community suggestions
+
+- [ ] Deploy the Google Sheet receiver and configure Cloudflare secrets/Turnstile.
+- [ ] Verify anonymous submission, retry, challenge failures and edge rate limiting.
+- [ ] Confirm inbox privacy and review access; see [suggestions.md](suggestions.md).
+- [ ] Include suggestions in the privacy notice and choose a retention policy.
+
 ## Product, privacy and operations
 
 - [ ] Show users which account is signed in.

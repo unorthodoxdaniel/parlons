@@ -1,0 +1,177 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import T from '../components/T.astro';
+import {PUBLIC_SUGGESTIONS_TURNSTILE_SITE_KEY} from 'astro:env/client';
+---
+<Layout>
+  <Header />
+  <main class="site-shell suggestions">
+    <h1><T k="suggestHeading" /></h1>
+    <p class="intro"><T k="suggestIntro" /></p>
+    <noscript><p><T k="suggestNoScript" /></p></noscript>
+    <form id="suggest-form">
+      <fieldset>
+        <legend class="eyebrow"><T k="suggestType" /></legend>
+        <label class="choice"><input type="radio" name="kind" value="feature" checked /><T k="suggestFeature" /></label>
+        <label class="choice"><input type="radio" name="kind" value="prompt" /><T k="suggestPrompt" /></label>
+      </fieldset>
+      <div id="prompt-fields" hidden>
+        <label for="suggest-language" class="eyebrow"><T k="suggestLanguage" /></label>
+        <select id="suggest-language" disabled></select>
+        <label for="suggest-theme" class="eyebrow"><T k="suggestTheme" /></label>
+        <select id="suggest-theme" disabled></select>
+      </div>
+      <label for="suggest-body" class="eyebrow"><T k="suggestText" /></label>
+      <textarea id="suggest-body" minlength="10" maxlength="2000" rows="5" required aria-describedby="suggest-hint"></textarea>
+      <p id="suggest-hint" class="hint"><T k="suggestHint" /></p>
+      <p class="hint"><T k="suggestReview" /></p>
+      <div class="honey" aria-hidden="true">
+        <label for="suggest-website"><T k="suggestWebsite" /></label>
+        <input id="suggest-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      {PUBLIC_SUGGESTIONS_TURNSTILE_SITE_KEY && <div id="suggest-captcha" class="cf-turnstile" data-sitekey={PUBLIC_SUGGESTIONS_TURNSTILE_SITE_KEY} data-action="suggestion" data-size="flexible" data-theme="auto"></div>}
+      {PUBLIC_SUGGESTIONS_TURNSTILE_SITE_KEY && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+      <button id="suggest-send" type="submit" disabled><T k="suggestSend" /></button>
+    </form>
+    <p id="suggest-status" role="status" aria-live="polite"></p>
+    <button id="suggest-another" class="text-action" type="button" hidden><T k="suggestAnother" /></button>
+  </main>
+  <Footer />
+</Layout>
+<script>
+  import {createClient} from '@supabase/supabase-js';
+  import {PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUGGESTIONS_TURNSTILE_SITE_KEY} from 'astro:env/client';
+  // Only the public language/theme catalogue is read from Supabase.
+  const catalogue = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+  import {t, ui, themeName, type UiKey} from '../i18n/ui';
+  const form = document.querySelector<HTMLFormElement>('#suggest-form')!;
+  const body = document.querySelector<HTMLTextAreaElement>('#suggest-body')!;
+  const language = document.querySelector<HTMLSelectElement>('#suggest-language')!;
+  const theme = document.querySelector<HTMLSelectElement>('#suggest-theme')!;
+  const send = document.querySelector<HTMLButtonElement>('#suggest-send')!;
+  const status = document.querySelector<HTMLElement>('#suggest-status')!;
+  const another = document.querySelector<HTMLButtonElement>('#suggest-another')!;
+  const draftKey = 'parlons:suggest-draft';
+  let busy = false, loaded = false, success = false;
+  let id = crypto.randomUUID();
+  let languages: {id:number;code:string;name:string}[] = [];
+  let themes: {id:number;key:string;name:string}[] = [];
+  let message: UiKey | null = null;
+  const kind = () => (form.elements.namedItem('kind') as RadioNodeList).value;
+  const locale = () => document.documentElement.dataset.uiLang === 'fr' ? 'fr' : 'en';
+  function say(key: UiKey | null) { message = key; status.innerHTML = key ? t(key) : ''; }
+  function update() {
+    const prompt = kind() === 'prompt';
+    document.querySelector<HTMLElement>('#prompt-fields')!.hidden = !prompt;
+    language.required = prompt; language.disabled = theme.disabled = busy || !loaded || !prompt;
+    send.disabled = busy || (prompt && !loaded);
+    body.disabled = busy;
+    form.querySelectorAll<HTMLInputElement>('[name="kind"]').forEach(input => input.disabled = busy);
+    form.setAttribute('aria-busy', String(busy));
+  }
+  function save() {
+    try { sessionStorage.setItem(draftKey, JSON.stringify({kind:kind(),body:body.value,language:language.value,theme:theme.value,id})); } catch {}
+  }
+  function options() {
+    const lang = language.value, selectedTheme = theme.value;
+    const l = locale();
+    language.replaceChildren(new Option(ui[l].suggestChooseLanguage, ''));
+    const names = new Intl.DisplayNames([l], {type:'language'});
+    for (const row of languages) language.add(new Option(names.of(row.code) ?? row.name, row.code));
+    theme.replaceChildren(new Option(ui[l].suggestAnyTheme, ''));
+    for (const row of themes) theme.add(new Option(themeName(row.key,row.name)[l], row.key));
+    language.value = lang; theme.value = selectedTheme;
+  }
+  function restore() {
+    try {
+      const draft = JSON.parse(sessionStorage.getItem(draftKey) ?? 'null');
+      if (!draft || typeof draft.body !== 'string') return;
+      (form.elements.namedItem('kind') as RadioNodeList).value = draft.kind === 'prompt' ? 'prompt' : 'feature';
+      body.value = draft.body.slice(0,2000);
+      if (typeof draft.id === 'string' && /^[0-9a-f-]{36}$/i.test(draft.id)) id = draft.id;
+      language.value = String(draft.language ?? ''); theme.value = String(draft.theme ?? '');
+    } catch {}
+  }
+  form.addEventListener('input', () => { id = crypto.randomUUID(); save(); update(); });
+  form.addEventListener('change', () => { id = crypto.randomUUID(); save(); update(); });
+  form.addEventListener('submit', async event => {
+    event.preventDefault(); if (busy || success) return;
+    const prompt = kind() === 'prompt';
+    const text = body.value.trim();
+    if (text.length < 10 || text.length > 2000 || (prompt && !language.value)) { say('suggestInvalid'); return; }
+    save();
+    if (!PUBLIC_SUGGESTIONS_TURNSTILE_SITE_KEY) { say('suggestUnavailable'); return; }
+    const token = form.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]')?.value;
+    if (!token) { say('suggestVerification'); return; }
+    busy = true; update(); say('suggestSending');
+    try {
+      const response = await fetch('/api/suggestions', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({id,kind:kind(),body:text,language:prompt ? language.value : '',
+          theme:prompt ? theme.value : '',token,website:(form.elements.namedItem('website') as HTMLInputElement).value}),
+        signal:AbortSignal.timeout(25000),
+      });
+      const result = await response.json();
+      if (!response.ok || result.ok !== true) {
+        say(response.status === 429 ? 'suggestLimit' : response.status === 403 ? 'suggestVerification' : response.status === 503 ? 'suggestUnavailable' : 'suggestError');
+        return;
+      }
+      success = true; form.hidden = true; another.hidden = false; say('suggestSuccess');
+      try { sessionStorage.removeItem(draftKey); } catch {}
+    } catch { say('suggestError'); }
+    finally {
+      busy = false; update();
+      (window as Window & {turnstile?: {reset: (container: string) => void}}).turnstile?.reset('#suggest-captcha');
+    }
+  });
+  another.addEventListener('click', () => {
+    success = false; id = crypto.randomUUID(); form.reset(); form.hidden = false;
+    another.hidden = true; say(null); update(); body.focus();
+  });
+  new MutationObserver(() => { options(); if (message) say(message); }).observe(document.documentElement,{attributes:true,attributeFilter:['data-ui-lang']});
+  restore(); update();
+  void (async () => {
+    try {
+      const [l, th] = await Promise.all([
+        catalogue.from('languages').select('id,code,name').order('id').abortSignal(AbortSignal.timeout(15000)),
+        catalogue.from('themes').select('id,key,name').order('id').abortSignal(AbortSignal.timeout(15000)),
+      ]);
+      if (l.error || th.error) throw l.error ?? th.error;
+      languages = l.data; themes = th.data; loaded = true; options(); restore(); update();
+    } catch { say('suggestLoadError'); }
+  })();
+</script>
+<style>
+  .suggestions { max-width: var(--reading-width); padding: 56px 0 72px; }
+  h1 { font: 400 clamp(2.5rem,6vw,4rem)/1.08 var(--serif); letter-spacing: -.04em; margin: 0 0 24px; }
+  .intro { font: 400 1.35rem/1.5 var(--serif); margin-bottom: 36px; }
+  fieldset { border: 0; border-top: 1px solid var(--ink); margin: 0 0 28px; padding: 16px 0 0; }
+  legend { padding-right: 16px; }
+  .choice { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-right: 24px; cursor: pointer; }
+  input { accent-color: var(--ink); width: 18px; height: 18px; }
+  .choice:has(:checked) { text-decoration: underline; text-underline-offset: .3em; }
+  select, textarea { display: block; width: 100%; min-height: 44px; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; padding: 12px 0; background: var(--paper); color: var(--ink); font: inherit; }
+  textarea { resize: vertical; margin-top: 10px; }
+  #prompt-fields { margin-bottom: 28px; }
+  select { margin-bottom: 20px; }
+  .hint { color: var(--muted); font-size: .85rem; }
+  .honey { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  #suggest-captcha { margin-top: 24px; }
+  #suggest-send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 16px;
+    padding: 10px 24px;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font: 400 1.2rem/1.3 var(--serif);
+  }
+  #suggest-send:hover:not(:disabled) { text-decoration: underline; text-underline-offset: .2em; }
+  #suggest-send:disabled { background: var(--rule); border-color: var(--rule); color: var(--ink); }
+</style>
