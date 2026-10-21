@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import T from '../components/T.astro';
+const sections = ['Account', 'Practice', 'Browser', 'Suggestions', 'Security', 'Providers', 'Retention', 'Requests', 'Changes'] as const;
+---
+<Layout title="Parlons — Privacy / Confidentialité">
+  <Header />
+  <main class="site-shell privacy-page">
+    <h1><T k="privacyHeading" /></h1>
+    <p class="meta"><time datetime="2026-10-21"><T k="privacyUpdated" /></time></p>
+    <p class="intro"><T k="privacyIntro" /></p>
+    <section aria-labelledby="privacy-contact">
+      <h2 id="privacy-contact"><T k="privacyContactHeading" /></h2>
+      <p><T k="privacyContact" /> <a href="mailto:nielparle@gmail.com">nielparle@gmail.com</a></p>
+    </section>
+    {sections.map(section => <section aria-labelledby={`privacy-${section.toLowerCase()}`}>
+      <h2 id={`privacy-${section.toLowerCase()}`}><T k={`privacy${section}Heading`} /></h2>
+      <p><T k={`privacy${section}`} /></p>
+      {section === 'Providers' && <>
+        <p><T k="privacyProviderLinks" /></p>
+        <ul class="provider-links">
+          <li><a href="https://supabase.com/privacy">Supabase</a></li>
+          <li><a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a></li>
+          <li><a href="https://policies.google.com/privacy">Google</a></li>
+          <li><a href="https://www.namecheap.com/legal/general/privacy-policy/">Namecheap</a></li>
+        </ul>
+      </>}
+    </section>)}
+  </main>
+  <Footer />
+</Layout>
+<style>
+  .privacy-page { max-width: var(--reading-width); padding-block: 48px 72px; }
+  h1 { margin: 0 0 20px; font: 400 clamp(2.5rem, 8vw, 4rem)/1.1 var(--serif); }
+  .intro { margin-block: 28px 36px; font: 400 1.4rem/1.5 var(--serif); }
+  section { border-top: 1px solid var(--rule); margin-top: 28px; padding-top: 20px; }
+  h2 { margin: 0 0 12px; font: 400 1.7rem/1.25 var(--serif); }
+  p { margin: 0 0 16px; }
+  a { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; overflow-wrap: anywhere; text-decoration: underline; text-underline-offset: .2em; }
+  .provider-links { display: flex; flex-wrap: wrap; gap: 0 24px; list-style: none; padding: 0; margin: 0; }
+</style>
