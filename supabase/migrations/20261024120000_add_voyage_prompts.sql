@@ -1,0 +1,109 @@
+-- Add 30 approved Voyage ideas in English and French; preserve all existing prompts.
+-- Source: docs/prompt-bank-voyage.csv; includes the approved TR26 revision.
+do $import$
+begin
+  create temporary table parlons_expansion_bank (
+    draft_id text not null,
+    theme_key text not null,
+    language_code text not null,
+    text text not null,
+    primary key (draft_id, language_code),
+    unique (language_code, text)
+  ) on commit drop;
+
+  insert into parlons_expansion_bank (draft_id, theme_key, language_code, text) values
+    ('TR21', 'travel', 'en', 'A five-star hotel alone or a hostel with your best friends: which feels more like a holiday?'),
+    ('TR21', 'travel', 'fr', 'Un hôtel cinq étoiles en solo ou une auberge de jeunesse avec vos meilleurs amis : où vous sentiriez-vous le plus en vacances ?'),
+    ('TR22', 'travel', 'en', 'Same price, same destination: a private hotel room or a hostel where you might make friends?'),
+    ('TR22', 'travel', 'fr', 'Même prix, même destination : une chambre d''hôtel privée ou une auberge de jeunesse où vous pourriez vous faire des amis ?'),
+    ('TR23', 'travel', 'en', 'Would you rather travel cheaply every year or luxuriously once every five years?'),
+    ('TR23', 'travel', 'fr', 'Préféreriez-vous voyager à petit budget chaque année ou vous offrir le grand luxe tous les cinq ans ?'),
+    ('TR24', 'travel', 'en', 'Your friends choose a trip you can barely afford. Do you ask them to change it or sit this one out?'),
+    ('TR24', 'travel', 'fr', 'Vos amis choisissent un voyage que vous pouvez à peine vous payer. Leur demandez-vous de changer de projet ou renoncez-vous à partir ?'),
+    ('TR25', 'travel', 'en', 'What would you happily save on during a trip, and what would ruin it if you went cheap?'),
+    ('TR25', 'travel', 'fr', 'Sur quoi économiseriez-vous volontiers en voyage, et sur quoi cela gâcherait-il vos vacances ?'),
+    ('TR26', 'travel', 'en', 'Your friend pays for your holiday, then expects you to follow their itinerary every day. Can you say no?'),
+    ('TR26', 'travel', 'fr', 'Un ami vous offre les vacances, puis attend que vous suiviez son programme chaque jour. Pouvez-vous dire non ?'),
+    ('TR27', 'travel', 'en', 'Can someone be a great friend and a terrible travel companion?'),
+    ('TR27', 'travel', 'fr', 'Peut-on être un excellent ami et un mauvais compagnon de voyage ?'),
+    ('TR28', 'travel', 'en', 'On a group holiday, is spending a whole day alone rude or necessary?'),
+    ('TR28', 'travel', 'fr', 'En vacances en groupe, passer une journée entière en solo : impoli ou nécessaire ?'),
+    ('TR29', 'travel', 'en', 'You paid extra for comfort; your friend chose the cheapest option. Should you split up for the journey?'),
+    ('TR29', 'travel', 'fr', 'Vous payez plus pour voyager confortablement ; votre ami choisit le moins cher. Faut-il faire le trajet séparément ?'),
+    ('TR30', 'travel', 'en', 'Is a holiday together a fair test of a relationship?'),
+    ('TR30', 'travel', 'fr', 'Partir en vacances ensemble est-il un bon test pour un couple ?'),
+    ('TR31', 'travel', 'en', 'One friend takes all the photos but appears in none. Whose job is it to notice?'),
+    ('TR31', 'travel', 'fr', 'Un ami prend toutes les photos, mais n''apparaît sur aucune. À qui de le remarquer ?'),
+    ('TR32', 'travel', 'en', 'One person plans the whole trip. Do they get the final say when everyone else complains?'),
+    ('TR32', 'travel', 'fr', 'Une seule personne organise tout le voyage. A-t-elle le dernier mot quand les autres se plaignent ?'),
+    ('TR33', 'travel', 'en', 'Is doing nothing on holiday a waste of the trip or the whole point?'),
+    ('TR33', 'travel', 'fr', 'Ne rien faire en vacances : du temps perdu ou le but du voyage ?'),
+    ('TR34', 'travel', 'en', 'Would you cross the world for one concert, meal or football match?'),
+    ('TR34', 'travel', 'fr', 'Traverseriez-vous le monde pour un seul concert, repas ou match de football ?'),
+    ('TR35', 'travel', 'en', 'Can a place disappoint you and still be worth visiting?'),
+    ('TR35', 'travel', 'fr', 'Un lieu peut-il vous décevoir tout en méritant le voyage ?'),
+    ('TR36', 'travel', 'en', 'Would you rather miss the famous sights or miss the chance to wander?'),
+    ('TR36', 'travel', 'fr', 'Préféreriez-vous manquer les sites incontournables ou l''occasion de flâner ?'),
+    ('TR37', 'travel', 'en', 'What''s an ordinary moment from a trip that you''d choose to live again?'),
+    ('TR37', 'travel', 'fr', 'Quel moment ordinaire d''un voyage aimeriez-vous revivre ?'),
+    ('TR38', 'travel', 'en', 'When does adapting to local customs start to feel like pretending to be someone else?'),
+    ('TR38', 'travel', 'fr', 'Quand s''adapter aux coutumes locales donne-t-il l''impression de jouer un rôle ?'),
+    ('TR39', 'travel', 'en', 'Can you love travelling and still dislike being a tourist?'),
+    ('TR39', 'travel', 'fr', 'Peut-on aimer voyager sans aimer être touriste ?'),
+    ('TR40', 'travel', 'en', 'Is it selfish to keep a beautiful place secret?'),
+    ('TR40', 'travel', 'fr', 'Est-ce égoïste de garder un bel endroit secret ?'),
+    ('TR41', 'travel', 'en', 'Your dream destination goes viral. Does that make you more excited to visit or less?'),
+    ('TR41', 'travel', 'fr', 'Votre destination de rêve devient virale. Cela vous donne-t-il plus ou moins envie d''y aller ?'),
+    ('TR42', 'travel', 'en', 'Should influencers ask permission before sharing the location of a quiet local spot?'),
+    ('TR42', 'travel', 'fr', 'Les influenceurs devraient-ils demander la permission avant de révéler l''emplacement d''un lieu tranquille fréquenté par les habitants ?'),
+    ('TR43', 'travel', 'en', 'If a place looks better in photos than in person, who let you down: the place or the posts?'),
+    ('TR43', 'travel', 'fr', 'Un lieu est plus beau en photo qu''en vrai. Qui vous a déçu : le lieu ou les publications ?'),
+    ('TR44', 'travel', 'en', 'Would you trust an AI to plan a surprise holiday if you couldn''t change the itinerary?'),
+    ('TR44', 'travel', 'fr', 'Confieriez-vous l''organisation de vacances surprises à une IA sans pouvoir changer le programme ?'),
+    ('TR45', 'travel', 'en', 'If translation apps worked perfectly, would learning a few local phrases still matter?'),
+    ('TR45', 'travel', 'fr', 'Si les applis de traduction fonctionnaient parfaitement, serait-il encore important d''apprendre quelques mots de la langue locale ?'),
+    ('TR46', 'travel', 'en', 'A café bans photos. Does that make you want to visit or go somewhere else?'),
+    ('TR46', 'travel', 'fr', 'Un café interdit les photos. Cela vous donne-t-il envie d''y aller ou de choisir un autre endroit ?'),
+    ('TR47', 'travel', 'en', 'Should visitors pay to enter a city that residents can barely afford to live in?'),
+    ('TR47', 'travel', 'fr', 'Faudrait-il faire payer l''entrée aux visiteurs d''une ville où les habitants peinent à se loger ?'),
+    ('TR48', 'travel', 'en', 'Would you take an overnight train instead of a short flight if it cost twice as much?'),
+    ('TR48', 'travel', 'fr', 'Prendriez-vous un train de nuit plutôt qu''un vol court s''il coûtait deux fois plus cher ?'),
+    ('TR49', 'travel', 'en', 'Does visiting a cheaper version of your dream destination feel clever or disappointing?'),
+    ('TR49', 'travel', 'fr', 'Choisir une alternative moins chère à votre destination de rêve : bonne idée ou déception ?'),
+    ('TR50', 'travel', 'en', 'When does filming your holiday start to spoil it for the people travelling with you?'),
+    ('TR50', 'travel', 'fr', 'À partir de quand filmer vos vacances gâche-t-il celles de vos compagnons de voyage ?');
+
+  if (select count(*) from parlons_expansion_bank) <> 60 then
+    raise exception 'Prompt expansion requires exactly 60 bilingual rows';
+  end if;
+
+  if (select count(*) from parlons_expansion_bank b
+      join public.languages l on l.code = b.language_code
+      join public.themes t on t.key = b.theme_key) <> 60 then
+    raise exception 'Prompt expansion requires all existing language and theme rows';
+  end if;
+
+  -- Skip existing exact wording within a language, matching the original import.
+  insert into public.prompts (language_id, theme_id, text)
+  select l.id, t.id, b.text
+  from parlons_expansion_bank b
+  join public.languages l on l.code = b.language_code
+  join public.themes t on t.key = b.theme_key
+  where not exists (
+    select 1 from public.prompts p
+    where p.language_id = l.id and lower(btrim(p.text)) = lower(btrim(b.text))
+  )
+  order by b.theme_key, b.draft_id, b.language_code;
+
+  -- Also catch a wording conflict in a different theme rather than silently skip it.
+  if (select count(*) from parlons_expansion_bank b
+      where exists (
+        select 1 from public.prompts p
+        join public.languages l on l.id = p.language_id
+        join public.themes t on t.id = p.theme_id
+        where l.code = b.language_code and t.key = b.theme_key and p.text = b.text
+      )) <> 60 then
+    raise exception 'Prompt expansion verification failed';
+  end if;
+end
+$import$;
