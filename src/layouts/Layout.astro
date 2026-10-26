@@ -23,6 +23,9 @@ const {
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <title>{title}</title>
+    {import.meta.env.PROD && (
+      <script is:inline defer src="https://cloud.umami.is/script.js" data-website-id="883607e7-6c08-4ad4-977a-0af1b96f5d36"></script>
+    )}
 
     <!-- Interface language: a saved explicit choice wins; otherwise fr / fr-* in
          the browser's preferred language means French, anything else English.

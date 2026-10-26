@@ -80,7 +80,7 @@ UI strings live in `src/i18n/ui.ts`, with the same keys in `en` and `fr`. Render
 
 ## Analytics
 
-Analytics is not configured. Parlons will get its own Umami site; do not reuse Niel Parle's site ID.
+Production pages use Umami Cloud with the shared Niel Parle website ID, as explicitly chosen to stay on the free plan. Filter by hostname to distinguish Parlons traffic. Development pages do not load analytics.
 
 ## Verification
 
