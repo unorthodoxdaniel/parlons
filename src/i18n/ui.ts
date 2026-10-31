@@ -341,8 +341,8 @@ export type UiKey = keyof typeof en;
 // Theme names are presentation only. The database keys (themes.key) are
 // language-independent; unknown keys fall back to the database name.
 const themeNames = {
-  en: { technology: 'Technology', work: 'Work', travel: 'Travel', 'everyday-life': 'Everyday life', relationships: 'Relationships', culture: 'Culture', society: 'Society', memories: 'Memories', learning: 'Learning', imagination: 'Imagination' } as Record<string, string>,
-  fr: { technology: 'Technologie', work: 'Travail', travel: 'Voyage', 'everyday-life': 'Vie quotidienne', relationships: 'Relations', culture: 'Culture', society: 'Société', memories: 'Souvenirs', learning: 'Apprentissage', imagination: 'Imagination' } as Record<string, string>,
+  en: { 'films-series': 'Films and series', technology: 'Technology', work: 'Work', travel: 'Travel', 'everyday-life': 'Everyday life', relationships: 'Relationships', culture: 'Culture', society: 'Society', memories: 'Memories', learning: 'Learning', imagination: 'Imagination' } as Record<string, string>,
+  fr: { 'films-series': 'Films et séries', technology: 'Technologie', work: 'Travail', travel: 'Voyage', 'everyday-life': 'Vie quotidienne', relationships: 'Relations', culture: 'Culture', society: 'Société', memories: 'Souvenirs', learning: 'Apprentissage', imagination: 'Imagination' } as Record<string, string>,
 };
 
 export function themeName(key: string, fallback: string) {

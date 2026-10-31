@@ -1,0 +1,71 @@
+draft_id,theme_key,language_code,text
+FS01,films-series,en,Which film or series would you love to watch again for the first time?
+FS01,films-series,fr,Quel film ou quelle série aimeriez-vous découvrir à nouveau pour la première fois ?
+FS02,films-series,en,What would you recommend to someone who says they never enjoy films?
+FS02,films-series,fr,Que conseilleriez-vous à quelqu'un qui dit ne jamais aimer les films ?
+FS03,films-series,en,Which fictional character would be a terrible flatmate?
+FS03,films-series,fr,Quel personnage de fiction ferait un colocataire insupportable ?
+FS04,films-series,en,Would you rather watch a brilliant film with a bad ending or an average film with a perfect ending?
+FS04,films-series,fr,Préféreriez-vous un excellent film à la fin ratée ou un film moyen à la fin parfaite ?
+FS05,films-series,en,"When does a series need to end, even if people still love it?"
+FS05,films-series,fr,"Quand faut-il arrêter une série, même si le public l'aime encore ?"
+FS06,films-series,en,"Do spoilers ruin a story, or can knowing the ending make it better?"
+FS06,films-series,fr,"Les révélations gâchent-elles une histoire, ou connaître la fin peut-il la rendre meilleure ?"
+FS07,films-series,en,Someone checks their phone throughout a film you chose. Do you say something?
+FS07,films-series,fr,Quelqu'un regarde son téléphone pendant tout le film que vous avez choisi. Lui faites-vous une remarque ?
+FS08,films-series,en,One episode a week or a whole season at once: which makes a series more enjoyable?
+FS08,films-series,fr,Un épisode par semaine ou toute une saison d'un coup : qu'est-ce qui rend une série plus agréable ?
+FS09,films-series,en,"You start a series together, but your friend watches ahead. Is that a betrayal?"
+FS09,films-series,fr,"Vous commencez une série ensemble, mais votre ami regarde la suite sans vous. Est-ce une trahison ?"
+FS10,films-series,en,Which film everyone seems to love left you cold?
+FS10,films-series,fr,Quel film que tout le monde semble adorer vous a laissé de marbre ?
+FS11,films-series,en,What makes a villain more interesting than the hero?
+FS11,films-series,fr,Qu'est-ce qui rend un méchant plus intéressant que le héros ?
+FS12,films-series,en,Can you love a character whose choices you completely disagree with?
+FS12,films-series,fr,Peut-on aimer un personnage dont on désapprouve tous les choix ?
+FS13,films-series,en,Which minor character deserves a story of their own?
+FS13,films-series,fr,Quel personnage secondaire mériterait sa propre histoire ?
+FS14,films-series,en,"If you could change one fictional ending, what would you change?"
+FS14,films-series,fr,"Si vous pouviez modifier une fin de fiction, que changeriez-vous ?"
+FS15,films-series,en,Would you rather live in your favourite fictional world or spend a day with its main character?
+FS15,films-series,fr,Préféreriez-vous vivre dans votre univers de fiction préféré ou passer une journée avec son personnage principal ?
+FS16,films-series,en,"Should an adaptation stay faithful to the book, even when that makes a worse film?"
+FS16,films-series,fr,"Une adaptation doit-elle rester fidèle au livre, même si cela donne un moins bon film ?"
+FS17,films-series,en,What makes a remake worth watching when the original already exists?
+FS17,films-series,fr,Qu'est-ce qui donne envie de voir une nouvelle version d'un film qui existe déjà ?
+FS18,films-series,en,Would you watch a sequel if your favourite character had been played by someone new?
+FS18,films-series,fr,Regarderiez-vous une suite si votre personnage préféré était joué par quelqu'un d'autre ?
+FS19,films-series,en,Can a beautiful film still be worth watching if its story is weak?
+FS19,films-series,fr,Un film magnifique mérite-t-il d'être vu si son histoire est faible ?
+FS20,films-series,en,Which matters more to you: believable dialogue or surprising events?
+FS20,films-series,fr,Qu'est-ce qui compte le plus pour vous : des dialogues crédibles ou des événements surprenants ?
+FS21,films-series,en,What scene has stayed with you long after you forgot the rest of the story?
+FS21,films-series,fr,Quelle scène vous est restée en mémoire alors que vous avez oublié le reste de l'histoire ?
+FS22,films-series,en,Has a film or series ever changed your mind about something?
+FS22,films-series,fr,Un film ou une série vous a-t-il déjà fait changer d'avis sur un sujet ?
+FS23,films-series,en,"Which film or series captures a place you know well, and what does it get wrong?"
+FS23,films-series,fr,"Quel film ou quelle série représente un lieu que vous connaissez bien, et que déforme-t-il ?"
+FS24,films-series,en,What would a film about your ordinary week need to make it interesting?
+FS24,films-series,fr,Que faudrait-il à un film sur votre semaine ordinaire pour le rendre intéressant ?
+FS25,films-series,en,You can save only one genre of film. Which one stays?
+FS25,films-series,fr,Vous ne pouvez conserver qu'un seul genre de cinéma. Lequel choisissez-vous ?
+FS26,films-series,en,Is watching a sad film a good way to improve a bad day?
+FS26,films-series,fr,Regarder un film triste est-il une bonne façon de se remonter le moral ?
+FS27,films-series,en,What makes you return to a familiar series instead of trying something new?
+FS27,films-series,fr,Qu'est-ce qui vous donne envie de revoir une série plutôt que d'en découvrir une nouvelle ?
+FS28,films-series,en,How many episodes should a series get before you give up on it?
+FS28,films-series,fr,Combien d'épisodes faut-il laisser à une série avant de l'abandonner ?
+FS29,films-series,en,Would you rather choose every film for your friends or never have to choose again?
+FS29,films-series,fr,Préféreriez-vous choisir tous les films pour vos amis ou ne plus jamais avoir à choisir ?
+FS30,films-series,en,Is a cinema ticket worth paying for when you can watch comfortably at home?
+FS30,films-series,fr,Une place de cinéma vaut-elle son prix quand on peut regarder un film confortablement chez soi ?
+FS31,films-series,en,Subtitles or dubbing: what do you gain and lose with each?
+FS31,films-series,fr,Sous-titres ou doublage : que gagne-t-on et que perd-on avec chaque option ?
+FS32,films-series,en,Should a historical drama be allowed to change real events for a better story?
+FS32,films-series,fr,Une fiction historique peut-elle modifier les faits pour raconter une meilleure histoire ?
+FS33,films-series,en,Can you enjoy a film while disliking the message you think it sends?
+FS33,films-series,fr,Peut-on apprécier un film tout en rejetant le message qu'on y voit ?
+FS34,films-series,en,Would you watch a series with no ending if everyone said the journey was worth it?
+FS34,films-series,fr,Regarderiez-vous une série sans fin si tout le monde disait qu'elle en vaut la peine ?
+FS35,films-series,en,Pitch a film about an everyday problem as though it were a major thriller.
+FS35,films-series,fr,Présentez un film sur un problème du quotidien comme s'il s'agissait d'un grand thriller.
