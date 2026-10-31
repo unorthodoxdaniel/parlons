@@ -14,3 +14,5 @@ The category uses the database key `films-series`, with interface labels “Film
 - Isolated the migration from the unrelated pending account-deletion migration; dry run listed only the films addition.
 - Migration applied successfully. Public readback verified all 70 new texts, 35 per language, and all 718 existing rows unchanged: 788 total prompts.
 - `npm run build` passed.
+- Published the Worker and static assets together to Cloudflare, version `1f88350a-ed10-46dc-bdd1-e85497e1539f`.
+- Verified the production homepage at https://parlons.nielparle.com and confirmed its served JavaScript includes the category key and both bilingual labels.
